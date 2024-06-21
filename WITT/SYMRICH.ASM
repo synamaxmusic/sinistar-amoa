@@ -106,7 +106,10 @@ PTHINK	EQU	%00100000	;* Warrior should activate intelligence or not.
 PWAIT	EQU	%01000000	;* Squadron leader waiting for squad to build.
 PSHOOT	EQU	%10000000	;* Turret locked if set, clear to shoot if clear
                                 
-MaxSinOrbit	EQU	12	;* Maximum orbital factor for Sinistar approach.	;;Fixme was: MaxSinOrbit	EQU	12.
+;MaxSinOrbit	EQU	12	;* Maximum orbital factor for Sinistar approach.	;;Fixme was: MaxSinOrbit	EQU	12.
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+MaxSinOrbit	EQU	10	;* Maximum orbital factor for Sinistar approach.
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 PSiniInhibit	EQU	PWaShIn	;* Sinistar personality uses the same bits.
                                 
 DPower	EQU	2		;* Distance scaling (in 4 pixels)

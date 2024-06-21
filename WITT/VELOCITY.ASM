@@ -56,6 +56,14 @@ newvelocity
 	puls	D		;* Restore velocity
 	rts
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	PULLORG ROMSAVE
+
+	INCLUDE "../WITT/LDYWCR.ASM"
+	
+	PUSHORG ROMSAVE
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 ;*****
 ;*
 ;* UPDATE OBJECT VELOCITY
@@ -150,12 +158,16 @@ updscanner
 	beq	.4S		;*   attained, then no change occurs.
 	sex			;* Otherwise,
 	jsr	0,U		;*   Cut the velocity difference
-	tstb			;* Only round up if B is positive
-	bmi	.2S		;*   else, round down.
-	orb	#1		;* < Patched over >
-	bra	.3S
-.2S	andb	#-2		;* Round down when B is negative.
-.3S	addb	0,Y		;* < Patched over >
+;	tstb			;* Only round up if B is positive
+;	bmi	.2S		;*   else, round down.
+;	orb	#1		;* < Patched over >
+;	bra	.3S
+;.2S	andb	#-2		;* Round down when B is negative.
+;.3S	addb	0,Y		;* < Patched over >
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	JSR	AMOAUpdateScanVEL
+	NOP
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	stb	0,Y		;*   gradual.
 .4S	bra	updexit		;* Done!
 ;***
@@ -181,4 +193,4 @@ updexit
 	PULLORG	ROMSAVE
 
 	INCLUDE "../WITT/CHASE.ASM"
-	INCLUDE "../WITT/LDYWCR.ASM"
+;	INCLUDE "../WITT/LDYWCR.ASM"

@@ -1,7 +1,19 @@
 	INCLUDE "../WITT/SPEAK.ASM"		;* Speak macro
 ;	INCLVER	RICH,Table			;* Table macro
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;  Noah's speech calls (except for SC8) appear in AMOA ROM 6 at address
+;;  $52ED, before the "AniSinistar" routine.  In the final version, the
+;;  speech calls were relocated after the routine, at address $551D.
+;; 
+
+	INCLUDE "../FALS/SC1.ASM"		;* Speech tunes
+
 	PUSHORG	ROMSAVE
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;	
+	
 ;	SUBTTL	AniSinistar - Animates Sinsitar Eyebrows
 ;****
 ;*
@@ -381,4 +393,4 @@ AniSCE	fcb	EOA,0					;* End animation.
 	PULLORG	ROMSAVE
 
 
-	INCLUDE "../FALS/SC1.ASM"		;* Speech tunes
+;	INCLUDE "../FALS/SC1.ASM"		;* Speech tunes

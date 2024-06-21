@@ -13,7 +13,7 @@
 	INCLUDE "../WITT/STBLINT.ASM"		;* Workers picking up crystals
 	INCLUDE "../WITT/STBLHEAV.ASM"		;* Workers delivering crystals
 ;*
-	INCLUDE "../WITT/STBLBOMB.ASM"		;* Player on demo bombing run
+;	INCLUDE "../WITT/STBLBOMB.ASM"		;* Player on demo bombing run
 ;*
 	PUSHORG	ROMSAVE
 

@@ -25,7 +25,7 @@
 	CLR	AMDEMO		;yes?, end attract mode demo
 	CLR	NPLAYER		;zero player count
 ;*	nop
-	ROUTINE	PntScrn		;* Point screen entry
+;	ROUTINE	PntScrn		;* Point screen entry
 	jmp	IAMode		;*   for attract mode.				;; Gets patched over by MICA/ZPNTSCRN.ASM ($583B)
 ;*
 	ROUTINE	Mortal		;* RTS here to be IMMORTAL.

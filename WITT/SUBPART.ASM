@@ -100,7 +100,12 @@ SUBPA3S	lda	OSLVEL,Y	;* Cut the LONG
 	inca			;*   color range from dim red to bright red
 SUBPA4S	sta	PCRAM		;*   for exploding a piece of the sinistar!
 	DISPLAY	GREY
-	PHRASE	GREY,35,SINIBOMB,ATTACK
+;	PHRASE	GREY,35,SINIBOMB,ATTACK
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	PHRASE	GREY,35,SINIBOMBS,ATTACK	;; AMOA
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 	PHRASE	GREY,35,DAMAGED,TARGET
 	ldd	#$500		;* Score points
 	jsr	addscore	;*   for destroying part of the Sinistar!

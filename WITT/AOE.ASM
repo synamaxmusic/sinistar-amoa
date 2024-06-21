@@ -35,10 +35,10 @@ Demo
 ;***
 ;*	<<< FIXES >>>
 ;***
-	INCLUDE "../SAM/SAMFIXES.ASM"
+;	INCLUDE "../SAM/SAMFIXES.ASM"
 	INCLUDE "../WITT/RICHFIXE.ASM"
 ;	INCLVER	NOAH,noahfixes						;;NOAHFIXE.SRC's only patch (FIXBOMCA) was commented out and not used.
-	INCLUDE "../MICA/BOBFIXES.ASM"
+;	INCLUDE "../MICA/BOBFIXES.ASM"
 ;***
 ;*	<<< SAM >>>
 ;***
@@ -59,7 +59,7 @@ Demo
 ;	ENDIF	Version-17.
 ;*
 ;* * *	INCLVER	RICH,fixdist	* Orbit alterations
-	INCLUDE "../WITT/FIXSINI.ASM"
+;	INCLUDE "../WITT/FIXSINI.ASM"
 ;	INCLVER	RICH,rich						;;This is where ZWASHODD was originally patched.  Moved over to WARRIOR.ASM.
 ;***
 ;*	<<< NOAH >>>

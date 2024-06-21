@@ -7,6 +7,9 @@
 	;INCLVER	RICH,display		;* Message display macros
 ;*
 ;* * *	INCLVER	RICH,button			;* Control panel routines
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	INCLUDE "../WITT/BUTTON.ASM"						;; Added this back for AMOA
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	INCLUDE "../WITT/COLLISIO.ASM"		;* Collision effects
 	INCLUDE "../WITT/COPYRIGH.ASM"		;* EBCDIC copyright
 	INCLUDE "../WITT/DIFFICUL.ASM"		;* Difficulty factor tables

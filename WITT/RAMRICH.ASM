@@ -29,6 +29,9 @@ Pop	rmb	21	;*((CDTEnd-ScoCdt)*3)/2	* Pop. of sector - each 3 bytes
 ;*				  current Population, next two are desired pop.
 WAgg	rmb	2		;* Warrior aggression factor
 SiniKills	rmb	1	;* The number of Sinistars killed.
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+PLUWPF	RMB	1		;Add the PlayerUpWarpFlag to the player's RAM
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	PULLORG	PlaySav
 
 ;;	SUBTTL	RAMSAVE
@@ -67,7 +70,7 @@ InStun		rmb	1	;* Sinistar stun timer.
 PlaGrave	rmb	1	;* Player grave marker while dead.
 SinGrave	rmb	1	;* Sinistar grave marker while dead.
 ;*                              
-InImpulse	rmb	1	;* The following timeline applies to the
+;InImpulse	rmb	1	;* The following timeline applies to the
 ;***				*   player warp out sequence:
 ;*	Sinistar dies.
 ;*	+ Warp sequence begins. Impulse engines carry player toward Sinistar.
@@ -78,7 +81,7 @@ InImpulse	rmb	1	;* The following timeline applies to the
 ;*	|
 ;*	+ End of warp sequence.
 ;***
-HSTDMRQ	RMB	1		;Flag set when HSTD/Marquee page is displayed
+;HSTDMRQ	RMB	1		;Flag set when HSTD/Marquee page is displayed
 	PULLORG	RamSav							;;Fixme was: PULLORG  RamSave (this was messing up Noah's RAM stuff)
 
 ;	SUBTTL	SRAMSAVE

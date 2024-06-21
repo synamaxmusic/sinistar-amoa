@@ -89,6 +89,27 @@ IEVBomb	sty	,X++		;* Save the new image pointer and descriptor.
 	bgt	.1S
 	rts
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	VECTOR	ExeVect
+AMOAINI 
+	RTS
+	
+	TST	$8504		;; uh, what? (is this supposed to be $9896, AMDemo?)
+	BEQ	.2S
+	LDA	RAPTIME		;; Similar code would ultimately end up in WITT/BUTTON.SRC
+	BEQ	.2S
+	DEC	RAPTIME
+	BNE	.2S
+	JSR	PLSHOOT
+	LDA	RAPRATE
+	CMPA	#$0A
+	BCC	.1S
+	ADDA	#$00
+	STA	RAPRATE
+.1S	STA	RAPTIME
+.2S	RTS
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 ;	SUBTTL	GAMVECT - Routines occuring each game start.
 ;*****
 ;*	 GGGG   AAA   M   M  V   V  EEEEE   CCCC  TTTTT
@@ -101,6 +122,11 @@ IEVBomb	sty	,X++		;* Save the new image pointer and descriptor.
 	jsr	Copyright	;* Get some random value in D
 	std	ASCPtr		;*   and save it for confusion.
 ;*
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+				;; More BUTTON.SRC code...
+	lda	#1		;* Zap the court check
+	sta	WECheck		;*   variable to help prevent detection.
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	rts
 
 ;	SUBTTL	IAMVECT - Routines occuring each attract mode start.
@@ -128,10 +154,10 @@ IEVBomb	sty	,X++		;* Save the new image pointer and descriptor.
 ;* Put the system into demo mode (AMDemo != 0)					
 ;***
 	jsr	StartDemo	;* Fake the Player 1 button hit.		;; This gets modified by SAM/FIXDAMPD.ASM ($5156)
-	NEW_SLEEP Task1,.2S,OMTLen+4 ;* Start player damping task
-	CLRD			;* Zero previous player
-	std	OMTLen,X	;*   l velocity and
-	std	OMTLen+2,X	;$   s velocity save
+;	NEW_SLEEP Task1,.2S,OMTLen+4 ;* Start player damping task
+;	CLRD			;* Zero previous player
+;	std	OMTLen,X	;*   l velocity and
+;	std	OMTLen+2,X	;$   s velocity save
 	jmp	Starts		;* Sieze control of the system.			;; This gets modified by SAM/FIXDAMPD.ASM ($5167)
 ;***
 ;* Do not demo the system (AMDemo == 0)
@@ -141,20 +167,20 @@ IEVBomb	sty	,X++		;* Save the new image pointer and descriptor.
 ;***
 ;* Player damping for attract mode task
 ;***
-.2S	LDX	#WPLAYER	;* Get current player
-	LDD	OLVEL,X		;*   l velocity and
-	ADDD	OMTLEN,Y	;*   add it to previous l velocity
-	ASRA			;* Divide by two
-	RORB			;*   to compute average
-	STD	OLVEL,X		;* Change player l velocity to average
-	STD	OMTLEN,Y	;*   and save for next damping
-	LDD	OSVEL,X		;* Get current player s velocity and
-	ADDD	OMTLEN+1,Y	;*   add it to previous s velocity		;; This gets modified by SAM/FIXDAMPD.ASM ($517C)
-	ASRA			;* Divide by two
-	RORB			;*   to compute average
-	STD	OSVEL,X		;* Change player s velocity to average
-	STD	OMTLEN+2,Y	;*   and save for next damping
-	SLEEP	LOOP		;* Sleep 1
+;.2S	LDX	#WPLAYER	;* Get current player
+;	LDD	OLVEL,X		;*   l velocity and
+;	ADDD	OMTLEN,Y	;*   add it to previous l velocity
+;	ASRA			;* Divide by two
+;	RORB			;*   to compute average
+;	STD	OLVEL,X		;* Change player l velocity to average
+;	STD	OMTLEN,Y	;*   and save for next damping
+;	LDD	OSVEL,X		;* Get current player s velocity and
+;	ADDD	OMTLEN+1,Y	;*   add it to previous s velocity		;; This gets modified by SAM/FIXDAMPD.ASM ($517C)
+;	ASRA			;* Divide by two
+;	RORB			;*   to compute average
+;	STD	OSVEL,X		;* Change player s velocity to average
+;	STD	OMTLEN+2,Y	;*   and save for next damping
+;	SLEEP	LOOP		;* Sleep 1
 
 	;SUBTTL	INIVECT - Routines occuring each player ship start.
 ;*****
@@ -166,8 +192,8 @@ IEVBomb	sty	,X++		;* Save the new image pointer and descriptor.
 ;*****
 	VECTOR	IniVect		;* On each turn start
 	clr	InStun		;* Clear Sinistar stun.
-	lda	#-1		;* Turn off the
-	sta	InImpulse	;*   impulse engines at turn start.
+;	lda	#-1		;* Turn off the
+;	sta	InImpulse	;*   impulse engines at turn start.
 	clr	PlaGrave	;* Remove grave marker.  Player is reborn.
 	clr	SinGrave	;* Remove grave marker.  Sinistar is reborn.
 	clr	RapTime		;* Turn off machine gun.
@@ -222,6 +248,9 @@ IEVBomb	sty	,X++		;* Save the new image pointer and descriptor.
 	ldx	#RISBomb+1	;* X -> RAM image descriptor block
 	jsr	IEVBomb		;* Initialize the animation.
 ;*
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	JSR	EMPTY
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	jsr	dispe		;* Erase the player message area
 ;*
 	clr	SiniSector	;* Sinistar sector flag.
@@ -268,23 +297,30 @@ ADemo	tst	AMDemo		;*   if the system is not in demo mode
 ;*	a bomb display was very obvious, but did not allow much demonstration
 ;*	of the attack on the Sinistar.
 ;***
-.2S	jsr	AddBombs	;* Begin with sinibombs
-	inca			;*   in the bombbay for the demo attack.
-	cmpa	#(MaxBombs/2)	;* Note that half the bombbay is full so that
+.2S	;jsr	AddBombs	;* Begin with sinibombs
+;	inca			;*   in the bombbay for the demo attack.
+;	cmpa	#(MaxBombs/2)	;* Note that half the bombbay is full so that
 										;;(patched over in MICA/BOBFIXES.ASM) ($525E)
-	blt	.2S		;*   crystal pickups are obviously making bombs.
+;	blt	.2S		;*   crystal pickups are obviously making bombs.
 ;*
 	New_Sleep	Task1,.100S,OTimer	;* Start watchdog task.
 	New_Sleep	Task1,CDTask		;* Start credits display.
 	New_Sleep	Task2,AMSini,OMTLEN+4	;* Start Bob's Sini Task
 	RADIX	10
-	ldd	#(40*60)/2			;*   which will run for		;;Fixme was: ldd #(40.*60.)/2
+;	ldd	#(40*60)/2			;*   which will run for		;;Fixme was: ldd #(40.*60.)/2
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	ldd	#(45*60)/2			;*   which will run for		;;Fixme was: ldd #(40.*60.)/2
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 										;;(patched over first by WITT/FIXINIRI.ASM,
 										;; and then again by MICA/BOBFIXES.ASM) ($5279)
 	RADIX 	16
 	std	OMTLen,X			;*   40 seconds
-	CLRD									;;CLRB and STD instructions both get patched over ($527E)
-	std	OMTLen+2,X
+;	CLRD									;;CLRB and STD instructions both get patched over ($527E)
+;	std	OMTLen+2,X
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	CLR	OMTLen+2,X
+	CLR	OMTLen+3,X
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 .99S	rts
 ;***
 ;*	This is the demo watchdog timer.
@@ -316,8 +352,13 @@ CDTask	lda	NPlayer		;* During the credit display
 ;*	P      LLLLL  A   A    V    EEEEE   CCCC    T
 ;*****
 	VECTOR	PlaVect		;* On each player's game start
-	jsr	empty		;* Make player's bomb bay empty
-	rts
+;	jsr	empty		;* Make player's bomb bay empty
+;	rts
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	NOP
+	NOP
+	RTS
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;	SUBTTL	POWVECT - Routines occuring each machine power-up.
 ;*****
@@ -362,11 +403,18 @@ CDTask	lda	NPlayer		;* During the credit display
 .100S	fdb	$6368				;;in ASCII.
 KenTbl	fdb	$6A00		;* U
 	fdb	$0000		;* U
-	fdb	$FDA0		;* U
-	fdb	$9700		;* U
-	fdb	$45F1		;* U
-	fdb	$4234		;* U
-	fdb	$A7BD		;* U
+;	fdb	$FDA0		;* U
+;	fdb	$9700		;* U
+;	fdb	$45F1		;* U
+;	fdb	$4234		;* U
+;	fdb	$A7BD		;* U
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	FDB	$0F4A
+	FDB	$622F
+	FDB	$3910
+	FDB	$40EE
+	FDB	$EAA7
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	fdb	$5769				;;These last four bytes spell out "Witt"
 	fdb	$7474				;;in ASCII.
 ;*	ENDTBL

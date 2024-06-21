@@ -47,24 +47,24 @@ richfixes
 ;*	New Jap Zapping Table.
 ;***
 ;	SYMVER	KENTBL,KENTBL
-	PUSHORG KenTbl								;;Adding PUSHORG here to replace KenTbl ($52E3)
-;	TABLE	KenTbl		;* This one is
-	fdb	$6A00		;*   as of 3/23 at 8:02 PM
-	fdb	$0000		;*   ... Rich.
-	fdb	$0C4A
-	fdb	$1591
-	fdb	$4543
-	fdb	$0150
-	fdb	$3502
-;	ENDTBL
-	PULLORG									;;Adding PULLORG, per TABLE macro.
+;	PUSHORG KenTbl								;;Adding PUSHORG here to replace KenTbl ($52E3)
+;;	TABLE	KenTbl		;* This one is
+;	fdb	$6A00		;*   as of 3/23 at 8:02 PM
+;	fdb	$0000		;*   ... Rich.
+;	fdb	$0C4A
+;	fdb	$1591
+;	fdb	$4543
+;	fdb	$0150
+;	fdb	$3502
+;;	ENDTBL
+;	PULLORG									;;Adding PULLORG, per TABLE macro.
 
-	INCLUDE "../WITT/FIXBUTTO.ASM"	;* FIREB version editing correction
-	INCLUDE "../WITT/FIXINIRI.ASM"	;* SINIB demo error and timing correction
-	INCLUDE "../WITT/FIXKRSIN.ASM"	;* Dead man's warp correction
-	INCLUDE "../WITT/FIXRISBO.ASM"	;* Value error correction
+;	INCLUDE "../WITT/FIXBUTTO.ASM"	;* FIREB version editing correction
+;	INCLUDE "../WITT/FIXINIRI.ASM"	;* SINIB demo error and timing correction
+;	INCLUDE "../WITT/FIXKRSIN.ASM"	;* Dead man's warp correction
+;	INCLUDE "../WITT/FIXRISBO.ASM"	;* Value error correction
 ;	INCLVER	RICH,fixsini	;* Sinistar death motion correction		;;(Already included in AOE.ASM)
-	INCLUDE "../WITT/ZSTBLIMP.ASM"	;* Impulse engine speed table tuned
-	INCLUDE "../WITT/ZSTBLBOM.ASM"	;* Demo bombing run speed table tuned
+;	INCLUDE "../WITT/ZSTBLIMP.ASM"	;* Impulse engine speed table tuned
+;	INCLUDE "../WITT/ZSTBLBOM.ASM"	;* Demo bombing run speed table tuned
 
 ;	ENDIF	Version-17.

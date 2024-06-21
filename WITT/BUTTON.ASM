@@ -32,7 +32,10 @@ BUTTON	EQU	*
 
 ;	LOCAL
 	BSWITCH	START1,OPEN						;;Fixme was: SWITCH  START1,OPEN
-WECO	SET	$45							;;Fixme was: .$WECO  SET  $45
+;WECO	SET	$45							;;Fixme was: .$WECO  SET  $45
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+WECO	SET	$25
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	lda	#$C3
 	cmpa	WECheck
 	lbne	rts
@@ -120,17 +123,17 @@ PHRSAV	SET	*		;; Mark the new address for PHRSAV to add
 ;*
 ;*****
 ;	LOCAL
-	BSWITCH	FIREB,OPEN						;;Fixme was: SWITCH  FIREB,OPEN
-	CLR	RAPTIME		;turn off rapid fire
-	TST	NPLAYER		;If there is no player
-	BEQ	.FIRE1S		;  then restart attract mode		;;Fixme was: BEQ  1$
-	TST	AMDEMO		;If there is a player but this is not demo mode
-	lbeq	rts		;  then return
-	TST	HSTDMRQ		;If we're in the middle of the HSTD page
-	lbne	rts		;  then just return
-	CLR	NPLAYER
-.FIRE1S	CLR	AMDEMO		;  else clear demo flags		;;Fixme was: 1$	CLR	AMDEMO	
-	JMP	IAMODE		;  and go restart demo
+;	BSWITCH	FIREB,OPEN						;;Fixme was: SWITCH  FIREB,OPEN
+;	CLR	RAPTIME		;turn off rapid fire
+;	TST	NPLAYER		;If there is no player
+;	BEQ	.FIRE1S		;  then restart attract mode		;;Fixme was: BEQ  1$
+;	TST	AMDEMO		;If there is a player but this is not demo mode
+;	lbeq	rts		;  then return
+;	TST	HSTDMRQ		;If we're in the middle of the HSTD page
+;	lbne	rts		;  then just return
+;	CLR	NPLAYER
+;.FIRE1S	CLR	AMDEMO		;  else clear demo flags		;;Fixme was: 1$	CLR	AMDEMO	
+;	JMP	IAMODE		;  and go restart demo
 ;
 ;	IFE	Version-17.
 ;*  <<<	This stuff was included by mistake >>>				;;(Yup, this was included in the final build)
@@ -178,16 +181,26 @@ PHRSAV	SET	*		;; Mark the new address for PHRSAV to add
 ;*****
 	BSWITCH	SBOMBB,CLOSE						;;Fixme was: SWITCH  SBOMBB,CLOSED (needs to be "CLOSE" not "CLOSED"!)
 	tst	AMDemo		;* If sinibomb button is hit while
-	lbne	rts		;*   in attract mode, do nothing.
+;	lbne	rts		;*   in attract mode, do nothing.
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	LBNE	BOMDUN		;; New label for AMOA
+AMOABOMB								;; Added label so that RJ's code can jump over here
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	lda	Bombs		;* If there are any bombs available for launch,
 	lbne	BombsAway	;*   and fire one.
 ;***
 ;* Out of bombs!
 ;***
 	DISPLAY	GREY							;;$6CE9
-	PHRASE	GREY,35,mine,crystal,to					;;Fixme was: PHRASE  GREY,35,mine,crystals,to
+;	PHRASE	GREY,35,mine,crystal,to					;;Fixme was: PHRASE  GREY,35,mine,crystals,to
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	PHRASE	GREY,35,mine,crystals,to
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;	IFE	Version-17.						;;(will have to reimplement this)
-	PHRASE	GREY,35,make,sinibomb					;;Fixme was: PHRASE  GREY,35,make,sinibombs
+;	PHRASE	GREY,35,make,sinibomb					;;Fixme was: PHRASE  GREY,35,make,sinibombs
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	PHRASE	GREY,35,make,sinibombs
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;	ELSE
 ;	PHRASE	GREY,35,make,a,sinibomb
 ;	ENDIF	Version-17.
@@ -198,15 +211,21 @@ ROMSAVE	SET	*		;; Save the current address
 	ORG	PHRSAV		;; Jump over to PHRSAV to save our pointers
 	FDB	_MINE
 ;	FDB	_CRYSTALS	;;(No plurals)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	FDB	_CRYSTALS
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	FDB	_TO
 	FDB	_MAKE
 ;	FDB	_SINIBOMBS	;;(No plurals)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	FDB	_SINIBOMBS
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 PHRSAV	SET	*		;; Mark the new address for PHRSAV to add
 				;; more phrases later
 
 	ORG	ROMSAVE		;; Back to our regularly scheduled programming...
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;	
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;*****
 ;*
 ;* BOMBSAWAY
@@ -220,7 +239,7 @@ PHRSAV	SET	*		;; Mark the new address for PHRSAV to add
 ;*
 ;*****
 	ROUTINE	BombsAway
-	pshs	A,B,X,Y		;* Save work registers
+;	pshs	A,B,X,Y		;* Save work registers
 	LDB	#DCNS+DWBL	;get dma constant to erase sinibomb display
 	JSR	UPBOMBS		;update sinibomb display. uses A
 	inc	InBombs		;* Mark another bomb launched.
@@ -232,6 +251,9 @@ PHRSAV	SET	*		;; Mark the new address for PHRSAV to add
 	ldx	#CSbomb		;* X -> Char. Desc. for sinibomb
 	jsr	[OInVec,X]	;* Create sinibomb, X -> scanner workspace
 ;*
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	PSHS   X
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	leay	X		;* Y -> Sinibomb scanner workspace.
 	ldx	[SinIndex]	;* X -> Sinistar scanner workspace.
 	jsr	ReTarget	;* Aim at the built part of the Sinistar.
@@ -253,7 +275,11 @@ PHRSAV	SET	*		;; Mark the new address for PHRSAV to add
 	RPT	0,aslb,rola	;*   to the cosine of the shot angle
 	addd	OLVEL+WPlayer	;*   and the player velocity.
 	std	OLVEL,X		;* Set the velocity.	
-	puls	A,B,X,Y		;* Restore work registers
+;	puls	A,B,X,Y		;* Restore work registers
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	PULS	X
+BOMDUN
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	rts
 ;****
 ;*
@@ -263,136 +289,141 @@ PHRSAV	SET	*		;; Mark the new address for PHRSAV to add
 ;*****
 ;	LOCAL
 	BSWITCH	SBOMBB,OPEN							;;Fixme was: SWITCH  SBOMBB,OPEN
-	ldx	#Credits	;* The trojan court check requires that
-	jsr	rcmosa		;*   there be no credits in the machine
-	tsta			;*   at the time the check is being made
-	bne	.SBOM1S		;*   to keep this from being found.		;;Fixme was: bne   1$
+;	ldx	#Credits	;* The trojan court check requires that
+;	jsr	rcmosa		;*   there be no credits in the machine
+;	tsta			;*   at the time the check is being made
+;	bne	.SBOM1S		;*   to keep this from being found.		;;Fixme was: bne   1$
 	asr	WECheck		;* Arithmetic shift right the court check.
 ;	NLIST
-.SBOM1S	lda	#$C3		;* If the magic C3 is still there, then		;;Fixme was: 1$	lda	#$C3
-	cmpa	WECheck		;*   three credits are the price to open
-	bne	.2S		;*   the secret door within the secret door.
-	ldx	#Credits	;* If there are not
-	jsr	rcmosa		;*   exactly 3 credits placed
-	cmpa	#(3<<4)		;*   in the machine then the			;;Fixme was: cmpa  #(3!<4)
-	bne	.2S		;*   test fails.  Else, ...
-	New_Sleep	Task4,.100S,OMTLen+1
-	RADIX	10
-	lda	#(15*16)	;* Run the secondary display			;;Fixme was: lda   #(15.*16.)
-	RADIX	16
-	sta	OMTLen,X	;*   for 15 seconds.
-	clr	WECheck		;* Lock the check from triggering this again.
-.2S	rts
-;*
-.100S	dec	OMTLen,Y	;* Count down the life clock of this task
-	bne	.101S		;*   until it hits zero and should die.
-	jsr	PClrScr		;* Then clear the screen
-	jmp	Die		;*   before dying.
-
-.101S	jsr	WE		;* Hi Williams!
-	pshs	A,B,X,Y		;* Save work registers
-
-	RADIX	10
-	
-	TEXT	(WECO+18),$5A+12	;* Hi Sam!				;;Fixme was: TEXT  (.$WECO+18.),$5A+12.
-	PHRASE	YELLOW,35,SAM
-
-	TEXT	(WECO+18),$5A+45						;;Fixme was: TEXT  (.$WECO+18.),$5A+45.
-	PHRASE	YELLOW,35,DICKER
-
-	TEXT	(WECO+26),($5A+16)	;* Hi Noah!				;;Fixme was: TEXT  (.$WECO+26.),($5A+16.)
-	PHRASE	YELLOW,35,N
-	PHRASE	YELLOW,35,O
-	PHRASE	YELLOW,35,A
-	PHRASE	YELLOW,35,H
-
-	TEXT	(WECO+2),($5A+16)						;;Fixme was: TEXT  (.$WECO+2),($5A+16.)
-	PHRASE	YELLOW,35,F
-	PHRASE	YELLOW,35,A
-	PHRASE	YELLOW,35,L
-	PHRASE	YELLOW,35,S
-	PHRASE	YELLOW,35,T
-	PHRASE	YELLOW,35,E
-	PHRASE	YELLOW,35,I
-	PHRASE	YELLOW,35,N
-
-	TEXT	(WECO-22),($5A+12)	;* Hi Rich!				;;Fixme was: TEXT  (.$WECO-22.),($5A+12.)
-	PHRASE	YELLOW,35,RICHARD
-
-	TEXT	(WECO-22),($5A+49)						;;Fixme was: TEXT  (.$WECO-22.),($5A+49.)
-	PHRASE	YELLOW,35,A
-
-	TEXT	(WECO-22),($5A+59)						;;Fixme was: TEXT  (.$WECO-22.),($5A+59.)
-	PHRASE	YELLOW,35,WITT
-
-	TEXT	(WECO+18),($5A+65)	;* Hi Bob!				;;Fixme was: TEXT  (.$WECO+18.),($5A+65.)
-	PHRASE	YELLOW,35,R
-	PHRASE	YELLOW,35,O
-	PHRASE	YELLOW,35,B
-	PHRASE	YELLOW,35,E
-	PHRASE	YELLOW,35,R
-	PHRASE	YELLOW,35,T
-
-	TEXT	(WECO-10),($5A+65)						;;Fixme was: TEXT  (.$WECO-10.),($5A+65.)
-	PHRASE	YELLOW,35,J
-
-	TEXT	(WECO-18),($5A+65)	;* Hi Bob!				;;Fixme was: TEXT  (.$WECO-18.),($5A+65.)
-	PHRASE	YELLOW,35,M
-	PHRASE	YELLOW,35,I
-	PHRASE	YELLOW,35,C
-	PHRASE	YELLOW,35,A
-	PHRASE	YELLOW,35,L
-
-	RADIX	16
-
-	puls	A,B,X,Y		;* Restore work registers
-	Sleep	LOOP
+;.SBOM1S	lda	#$C3		;* If the magic C3 is still there, then		;;Fixme was: 1$	lda	#$C3
+;	cmpa	WECheck		;*   three credits are the price to open
+;	bne	.2S		;*   the secret door within the secret door.
+;	ldx	#Credits	;* If there are not
+;	jsr	rcmosa		;*   exactly 3 credits placed
+;	cmpa	#(3<<4)		;*   in the machine then the			;;Fixme was: cmpa  #(3!<4)
+;	bne	.2S		;*   test fails.  Else, ...
+;	New_Sleep	Task4,.100S,OMTLen+1
+;	RADIX	10
+;	lda	#(15*16)	;* Run the secondary display			;;Fixme was: lda   #(15.*16.)
+;	RADIX	16
+;	sta	OMTLen,X	;*   for 15 seconds.
+;	clr	WECheck		;* Lock the check from triggering this again.
+;.2S	rts
+;;*
+;.100S	dec	OMTLen,Y	;* Count down the life clock of this task
+;	bne	.101S		;*   until it hits zero and should die.
+;	jsr	PClrScr		;* Then clear the screen
+;	jmp	Die		;*   before dying.
+;
+;.101S	jsr	WE		;* Hi Williams!
+;	pshs	A,B,X,Y		;* Save work registers
+;
+;	RADIX	10
+;	
+;	TEXT	(WECO+18),$5A+12	;* Hi Sam!				;;Fixme was: TEXT  (.$WECO+18.),$5A+12.
+;	PHRASE	YELLOW,35,SAM
+;
+;	TEXT	(WECO+18),$5A+45						;;Fixme was: TEXT  (.$WECO+18.),$5A+45.
+;	PHRASE	YELLOW,35,DICKER
+;
+;	TEXT	(WECO+26),($5A+16)	;* Hi Noah!				;;Fixme was: TEXT  (.$WECO+26.),($5A+16.)
+;	PHRASE	YELLOW,35,N
+;	PHRASE	YELLOW,35,O
+;	PHRASE	YELLOW,35,A
+;	PHRASE	YELLOW,35,H
+;
+;	TEXT	(WECO+2),($5A+16)						;;Fixme was: TEXT  (.$WECO+2),($5A+16.)
+;	PHRASE	YELLOW,35,F
+;	PHRASE	YELLOW,35,A
+;	PHRASE	YELLOW,35,L
+;	PHRASE	YELLOW,35,S
+;	PHRASE	YELLOW,35,T
+;	PHRASE	YELLOW,35,E
+;	PHRASE	YELLOW,35,I
+;	PHRASE	YELLOW,35,N
+;
+;	TEXT	(WECO-22),($5A+12)	;* Hi Rich!				;;Fixme was: TEXT  (.$WECO-22.),($5A+12.)
+;	PHRASE	YELLOW,35,RICHARD
+;
+;	TEXT	(WECO-22),($5A+49)						;;Fixme was: TEXT  (.$WECO-22.),($5A+49.)
+;	PHRASE	YELLOW,35,A
+;
+;	TEXT	(WECO-22),($5A+59)						;;Fixme was: TEXT  (.$WECO-22.),($5A+59.)
+;	PHRASE	YELLOW,35,WITT
+;
+;	TEXT	(WECO+18),($5A+65)	;* Hi Bob!				;;Fixme was: TEXT  (.$WECO+18.),($5A+65.)
+;	PHRASE	YELLOW,35,R
+;	PHRASE	YELLOW,35,O
+;	PHRASE	YELLOW,35,B
+;	PHRASE	YELLOW,35,E
+;	PHRASE	YELLOW,35,R
+;	PHRASE	YELLOW,35,T
+;
+;	TEXT	(WECO-10),($5A+65)						;;Fixme was: TEXT  (.$WECO-10.),($5A+65.)
+;	PHRASE	YELLOW,35,J
+;
+;	TEXT	(WECO-18),($5A+65)	;* Hi Bob!				;;Fixme was: TEXT  (.$WECO-18.),($5A+65.)
+;	PHRASE	YELLOW,35,M
+;	PHRASE	YELLOW,35,I
+;	PHRASE	YELLOW,35,C
+;	PHRASE	YELLOW,35,A
+;	PHRASE	YELLOW,35,L
+;
+;	RADIX	16
+;
+;	puls	A,B,X,Y		;* Restore work registers
+;	Sleep	LOOP
 ;	LOCAL
 ;	LIST
-.1S	rts
+;.1S	rts
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-ROMSAVE	SET	*		;; Save the current address
-
-	ORG	PHRSAV		;; Jump over to PHRSAV to save our pointers
-	FDB	_SAM
-	FDB	_DICKER
-	
-	FDB	_N
-	FDB	_O
-	FDB	_A
-	FDB	_H
-	FDB	_F
-;	FDB	_A
-	FDB	_L
-	FDB	_S
-	FDB	_T
-;	FDB	_E		;;(Already defined)
-	FDB	_I
+;ROMSAVE	SET	*		;; Save the current address
+;
+;	ORG	PHRSAV		;; Jump over to PHRSAV to save our pointers
+;	FDB	_SAM
+;	FDB	_DICKER
+;	
 ;	FDB	_N
-
-	FDB	_RICHARD
-	FDB	_WITT
-	
-	FDB	_R
 ;	FDB	_O
-	FDB	_B
-;	FDB	_E
-;	FDB	_R
-;	FDB	_T
-
-	FDB	_J
-	
-	FDB	_M
-;	FDB	_I
-	FDB	_C
 ;	FDB	_A
-;	FDB	_L	
-
-PHRSAV	SET	*		;; Mark the new address for PHRSAV to add
-				;; more phrases later
-
-	ORG	ROMSAVE		;; Back to our regularly scheduled programming...
+;	FDB	_H
+;	FDB	_F
+;;	FDB	_A
+;	FDB	_L
+;	FDB	_S
+;	FDB	_T
+;;	FDB	_E		;;(Already defined)
+;	FDB	_I
+;;	FDB	_N
+;
+;	FDB	_RICHARD
+;	FDB	_WITT
+;	
+;	FDB	_R
+;;	FDB	_O
+;	FDB	_B
+;;	FDB	_E
+;;	FDB	_R
+;;	FDB	_T
+;
+;	FDB	_J
+;	
+;	FDB	_M
+;;	FDB	_I
+;	FDB	_C
+;;	FDB	_A
+;;	FDB	_L	
+;
+;PHRSAV	SET	*		;; Mark the new address for PHRSAV to add
+;				;; more phrases later
+;
+;	ORG	ROMSAVE		;; Back to our regularly scheduled programming...
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;	
+
+	rts			;; Added RTS without label for AMOA
+	
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 	PULLORG	ROMSAVE
 
 ;	INCLVER	RICH,empty

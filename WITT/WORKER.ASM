@@ -10,6 +10,15 @@
 ;KRWorker EQU	$6C73
 ;;===============================================================================
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	INCLUDE "../WITT/ANIWORK.ASM"		;* Animate
+	INCLUDE "../WITT/GETLVX.ASM"		;* Velocity module for orbits 	;;(Taken from DISTANCE.ASM)
+	INCLUDE "../WITT/DISTANCE.ASM"		;* Distance Computations
+	INCLUDE "../WITT/UPDDTC.ASM"		;* Update Distance to Caller
+	INCLUDE "../WITT/UPDFLANG.ASM"		;* Update Flight Angle
+	INCLUDE "../WITT/VELOCITY.ASM"		;* Velocity computations
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 	PUSHORG	ROMSAVE
 ;***
 ;*
@@ -351,11 +360,11 @@ workmis
 	PULLORG	ROMSAVE
 
 ;	INCLVER	RICH,addpart		;* Build up the sinistar
-	INCLUDE "../WITT/ANIWORK.ASM"		;* Animate
-	INCLUDE "../WITT/DISTANCE.ASM"		;* Distance Computations
+;	INCLUDE "../WITT/ANIWORK.ASM"		;* Animate
+;	INCLUDE "../WITT/DISTANCE.ASM"		;* Distance Computations
 ;	INCLVER	RICH,lswocr		;* Leaving sector routine
 ;	INCLVER	RICH,tables		;* Distance/Velocity tables
 	INCLUDE "../WITT/RETARGET.ASM"		;* Reposition Sinistar to center offset
-	INCLUDE "../WITT/UPDDTC.ASM"		;* Update Distance to Caller
-	INCLUDE "../WITT/UPDFLANG.ASM"		;* Update Flight Angle
-	INCLUDE "../WITT/VELOCITY.ASM"		;* Velocity computations
+;	INCLUDE "../WITT/UPDDTC.ASM"		;* Update Distance to Caller
+;	INCLUDE "../WITT/UPDFLANG.ASM"		;* Update Flight Angle
+;	INCLUDE "../WITT/VELOCITY.ASM"		;* Velocity computations

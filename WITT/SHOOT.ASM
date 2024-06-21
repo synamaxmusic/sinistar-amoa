@@ -27,21 +27,21 @@ SAVEDY	SET	4		;* Position of Y value on stack.
 	ldu	OSSCWSA,Y	;* If warrior is not on screen,
 	lbeq	.99S		;*   then exit.
 				
-	lda	SFree		;* If there are no more free screen object
-	lbeq	.99S		;*   workspaces, then a shot can't be fired.
+;	lda	SFree		;* If there are no more free screen object
+;	lbeq	.99S		;*   workspaces, then a shot can't be fired.
 ;***
 ;*	Shooting only occurs when the warrior is within scrolling borders.
 ;***
-	lda	OLPOS,U		;* Check that the long screen
-	cmpa	#BHSCROLL	;*   position is within the
-	lbls	.99S		;*   hard scrolling borders
-	cmpa	#THSCROLL	;*   at the top and bottom
-	lbhs	.99S		;*   and exit if outside the range.
-	lda	OSPOS,U		;* Check that the short screen
-	cmpa	#LHSCROLL	;*   position is within the
-	lbls	.99S		;*   hard scrolling borders
-	cmpa	#RHSCROLL	;*   at the left and right
-	lbhs	.99S		;*   and exit if outside the range.
+;	lda	OLPOS,U		;* Check that the long screen
+;	cmpa	#BHSCROLL	;*   position is within the
+;	lbls	.99S		;*   hard scrolling borders
+;	cmpa	#THSCROLL	;*   at the top and bottom
+;	lbhs	.99S		;*   and exit if outside the range.
+;	lda	OSPOS,U		;* Check that the short screen
+;	cmpa	#LHSCROLL	;*   position is within the
+;	lbls	.99S		;*   hard scrolling borders
+;	cmpa	#RHSCROLL	;*   at the left and right
+;	lbhs	.99S		;*   and exit if outside the range.
 ;***
 ;*	Shooting only occurs when the warrior uninhibited.
 ;***
@@ -56,25 +56,35 @@ SAVEDY	SET	4		;* Position of Y value on stack.
 ;***
 ;*
 ;***
-	jsr	aimflang
-	pshs	A
-
-	lda	OSANANG,Y	;* A = angle of the target
-	adda	#(CIRCLE/2)	;*   from the craft (opposite of animation).
-	adda	#(CIRCLE/(NITURRET*2))
-	anda	#%11100000	;*   one of 8 warrior angles out of 32 images.
-
-	tfr	A,B		;* If the warrior's turret is aligned
-	subb	,S+		;*   with the player,
-	bge	.2S		;*   then don't check if the
-	negb			;*   turret is locked in yet.
-.2S	cmpb	#(CIRCLE/(NITURRET*2))
-	ble	.3S
+;	jsr	aimflang
+;	pshs	A
+;
+;	lda	OSANANG,Y	;* A = angle of the target
+;	adda	#(CIRCLE/2)	;*   from the craft (opposite of animation).
+;	adda	#(CIRCLE/(NITURRET*2))
+;	anda	#%11100000	;*   one of 8 warrior angles out of 32 images.
+;
+;	tfr	A,B		;* If the warrior's turret is aligned
+;	subb	,S+		;*   with the player,
+;	bge	.2S		;*   then don't check if the
+;	negb			;*   turret is locked in yet.
+;.2S	cmpb	#(CIRCLE/(NITURRET*2))
+;	ble	.3S
 
 .3S	ldb	OSPERS,Y	;* If the turret hasn't locked into position
 	bitb	#PSHOOT		;*   then a shot can't be fired,
 	lbne	.99S		;*   so exit if not clear to shoot.
-;*                               
+;*   
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;     
+	lda	SFree		;* If there are no more free screen object
+	lbeq	.99S		;*   workspaces, then a shot can't be fired. 
+	
+	lda	OSANANG,Y	;* A = angle of the target
+	adda	#(CIRCLE/2)	;*   from the craft (opposite of animation).
+	adda	#(CIRCLE/(NITURRET*2))
+	anda	#%11100000	;*   one of 8 warrior angles out of 32 images.
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	
 	pshs	A		;* Save shot angle.
 SAVEDY	SET	SAVEDY+1
 

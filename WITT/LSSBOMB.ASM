@@ -41,7 +41,10 @@ LSSB1S	leax	Y		;* X -> sinibomb scanner workspace		;;Fixme was: 1$ (Had to conve
 	tsta			;*   the status of
 	bmi	LSSB99S		;*   sinibombs that leave sector.
 	DISPLAY	YELLOW
-	PHRASE	YELLOW,35,SINIBOMB
+;	PHRASE	YELLOW,35,SINIBOMB
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	PHRASE	YELLOW,35,SINIBOMBS
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	PHRASE	YELLOW,35,INTERCEPTED
 
 LSSB99S	puls	A,B,X,Y		;* Restore work registers			;;Fixme was: 99$

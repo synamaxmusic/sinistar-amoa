@@ -24,6 +24,12 @@
 
 	jsr	upddtp		;* Update distance to player (for explosion)
 	jsr	anisinistar	;* Else, it goes "chomp, chomp, chomp ..."
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	jsr	ScreenChk	;*   then wait until the Sinistar is on screen
+	bcs	.13S		;*   before reducing it any further.
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 ;***
 ;*	The orbital approach is reduced from a large orbit to a small orbit,
 ;*	eventually reaching no orbit at all.
@@ -38,10 +44,10 @@
 ;*			      +-------------------+ Reduced at any time.
 ;*	+---------------------+ Reduced only on screen.
 ;***
-	cmpb	#(MaxSinOrbit*3/4)	;* If the inhibitor is still within
-	bgt	.11S		;*   the inner orbit (less than MaxSinOrbit*3/4)
-	jsr	ScreenChk	;*   then wait until the Sinistar is on screen
-	bcs	.12S		;*   before reducing it any further.
+;	cmpb	#(MaxSinOrbit*3/4)	;* If the inhibitor is still within
+;	bgt	.11S		;*   the inner orbit (less than MaxSinOrbit*3/4)
+;	jsr	ScreenChk	;*   then wait until the Sinistar is on screen
+;	bcs	.12S		;*   before reducing it any further.
 .11S	decb			;* Else, the inhibitor is counted down from its
 .12S	pshs	B		;*   maximum value and stored back into the
 	anda	#$F0		;*   personality (leaving the rest of the		;;Fixme was: anda  #!N(PSiniInhib) (More range underflow errors)
@@ -54,28 +60,56 @@
 ;***
 ;*	Chase the player!  (Ooooh!  It's scary boys and girls!)
 ;***
-.20S	jsr	SiStopChk	;* If the Sinistar is under the kind of
-	bcs	.99S		;*   duress that means it should stay still.
+.20S	;jsr	SiStopChk	;* If the Sinistar is under the kind of
+;	bcs	.99S		;*   duress that means it should stay still.
 ;*	Go ...
 	ldx	[SinIndex]	;* Temporaily
-	LDD	SINLP		;get sinistar last piece offsets
-	PSHS	D		;save them
-	LDD	#412		;offset for mouth
-	STD	SINLP
+;	LDD	SINLP		;get sinistar last piece offsets
+;	PSHS	D		;save them
+;	LDD	#412		;offset for mouth
+;	STD	SINLP
 	jsr	ReTarget	;*   retarget the Sinistar
 	ldx	[PlaIndex]	;* X -> pseudo scanner workspace of PLAYER
-	jsr	.100S		;* D = the LONG distance to player
+;	jsr	.100S		;* D = the LONG distance to player
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	JSR	AMOASiniOrbit
+	RPT	3,NOP
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 	jsr	newvel		;* D = velocity to achieve
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	tst	InStun		;* If the Sinistar stun timer
+	beq	.2000S		;*   is turned on then it must
+	CLRD
+.2000S	
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 	jsr	updlvel		;* Update the long velocity
 ;*                              
 	ldx	[PlaIndex]	;* X -> pseudo scanner workspace of PLAYER
-	jsr	.200S		;* D = the SHORT distance to player
+;	jsr	.200S		;* D = the SHORT distance to player
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	JSR	AMOASiniOrbit2
+	RPT	3,NOP
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 	jsr	newvel		;* D = velocity to achieve
+	
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	tst	InStun		;* If the Sinistar stun timer
+	beq	.1000S		;*   is turned on then it must
+	CLRD
+.1000S	
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;	
+	
 	jsr	updsvel		;* Update the short velocity
 	ldx	[SinIndex]	;* Untarget the Sinistar to
 	jsr	UnTarget	;*   restore it's correct coordinates.
-	PULS	D		;restore sinistar last piece offsets
-	STD	SINLP
+;	PULS	D		;restore sinistar last piece offsets
+;	STD	SINLP
 
 .99S	puls	A,B,X,Y,U	;* Restore work registers
 	SLEEP	LOOP
@@ -84,9 +118,9 @@
 	anda	#PSiniInhibit
 	beq	.102S
 	ldb	SiniOrbit		;* Set orbital directon.
-	cmpa	#MaxSinOrbit
-	ble	.101S
-	lda	#MaxSinOrbit
+;	cmpa	#MaxSinOrbit
+;	ble	.101S
+;	lda	#MaxSinOrbit
 .101S	jsr	getlodistance
 	ldx	#StblOSini
 	rts
@@ -94,19 +128,19 @@
 	ldx	#STblSinistar								;;Fixme was: ldx  #STblSini
 	rts
 ;*
-.200S	lda	OSPERS,Y
-	anda	#PSiniInhibit
-	beq	.202S
-	ldb	SiniOrbit		;* Set orbital directon.
-	cmpa	#MaxSinOrbit
-	ble	.201S
-	lda	#MaxSinOrbit
-.201S	jsr	getsodistance
-	ldx	#StblOSini
-	rts
-.202S	jsr	getsdistance
-	ldx	#STblSinistar								;;Fixme was: ldx  #STblSini
-	rts
+;.200S	lda	OSPERS,Y
+;	anda	#PSiniInhibit
+;	beq	.202S
+;	ldb	SiniOrbit		;* Set orbital directon.
+;	cmpa	#MaxSinOrbit
+;	ble	.201S
+;	lda	#MaxSinOrbit
+;.201S	jsr	getsodistance
+;	ldx	#StblOSini
+;	rts
+;.202S	jsr	getsdistance
+;	ldx	#STblSinistar								;;Fixme was: ldx  #STblSini
+;	rts
 ;*****
 ;*
 ;* SISTOPCHK
@@ -123,41 +157,41 @@
 ;*	CARRY  SET  if it SHOULD STOP.
 ;*
 ;*****
-	ROUTINE	SiStopChk
-	pshs	Y		;* Save work registers
-;***
-;*	A stun should stop the Sinistar
-;***
-	tst	InStun		;* If stunned,
-	bne	.77S		;*   then zero the velocity.
-;***
-;*	A dying Sinistar should stop on screen.
-;***
-	tst	SinGrave	;* If the Sinistar is NOT dying,
-	beq	.1S		;*   then it should chase the player.
-	jsr	ScreenChk	;* If the Sinistar IS dying,
-	bcc	.77S		;*   and on screen, then it should stop.
-;***
-;*	An attract mode demonstration Sinistar should stop on screen.
-;***
-.1S	tst	AMDemo		;* If the Sinistar is NOT in a demo
-	beq	.2S		;*   then it can chase the player.
-	jsr	ScreenChk	;* If the Sinistar IS in a demo,
-	bcc	.77S		;*   and on screen, then it should stop.
-;*
-.2S	andcc	#~(CARRY)	;* GO.  Return with the carry bit clear.		;;Fixme was: andcc  #!N(CARRY)
-	bra	.99S
-;*
-.77S	clr	OSLVEL,Y	;* Clear the scanner
-	clr	OSSVEL,Y	;*   velocities.
-	ldy	OSSCWSA,Y	;* If the Sinistar
-	beq	.98S		;*   is on screen,
-	CLRD			;*   then clear
-	std	OLVEL,Y		;*   the screen
-	std	OSVEL,Y		;*   velocities.
-.98S	orcc	#CARRY		;* STOP.  Return with the carry bit set.
-.99S	puls	Y		;* Restore work registers
-	rts
+;	ROUTINE	SiStopChk
+;	pshs	Y		;* Save work registers
+;;***
+;;*	A stun should stop the Sinistar
+;;***
+;	tst	InStun		;* If stunned,
+;	bne	.77S		;*   then zero the velocity.
+;;***
+;;*	A dying Sinistar should stop on screen.
+;;***
+;	tst	SinGrave	;* If the Sinistar is NOT dying,
+;	beq	.1S		;*   then it should chase the player.
+;	jsr	ScreenChk	;* If the Sinistar IS dying,
+;	bcc	.77S		;*   and on screen, then it should stop.
+;;***
+;;*	An attract mode demonstration Sinistar should stop on screen.
+;;***
+;.1S	tst	AMDemo		;* If the Sinistar is NOT in a demo
+;	beq	.2S		;*   then it can chase the player.
+;	jsr	ScreenChk	;* If the Sinistar IS in a demo,
+;	bcc	.77S		;*   and on screen, then it should stop.
+;;*
+;.2S	andcc	#~(CARRY)	;* GO.  Return with the carry bit clear.		;;Fixme was: andcc  #!N(CARRY)
+;	bra	.99S
+;;*
+;.77S	clr	OSLVEL,Y	;* Clear the scanner
+;	clr	OSSVEL,Y	;*   velocities.
+;	ldy	OSSCWSA,Y	;* If the Sinistar
+;	beq	.98S		;*   is on screen,
+;	CLRD			;*   then clear
+;	std	OLVEL,Y		;*   the screen
+;	std	OSVEL,Y		;*   velocities.
+;.98S	orcc	#CARRY		;* STOP.  Return with the carry bit set.
+;.99S	puls	Y		;* Restore work registers
+;	rts
 
 	PULLORG	ROMSAVE
 

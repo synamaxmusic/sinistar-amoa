@@ -16,7 +16,10 @@
 
 ;* routine for sinistar leaving sector
 	ROUTINE	LSSINI								;; This gets patched over with SAM/FIXLSSIN.ASM ($5DBE)
-	jsr	Sinhibit	;* Re-initialize Sinistar attack personality.
+;	jsr	Sinhibit	;* Re-initialize Sinistar attack personality.
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	JMP	AMOASiniInhibit
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	LEAS	2,S		;never return to in-sector
 	LDD	OSLPOS,Y	;transfer sector coordinates into supersector
 	PSHS	A
@@ -26,7 +29,7 @@
 	SEX
 	STD	SSLPOS
 	DEC	SINISEC		;flag sinistar out of sector
-	JSR	DISPE		;erase player message area
+;	JSR	DISPE		;erase player message area
 	WAKE_HERE
 	LDB	OSLVEL,Y	;add l and s velocity to supersector position
 	ADDB	SCLVEL
@@ -114,5 +117,18 @@ PHRSAV	SET	*		;; Mark the new address for PHRSAV to add
 
 	ORG	ROMSAVE		;; Back to our regularly scheduled programming...
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+AMOALeaveSector			;; Used as generic leave-sector routine for many objects
+
+;; This AMOA section appears to be nearly duplicate code from LSWOCR 
+	pshs	X		;* Save work registers
+	leax	Y		;* Y -> worker scanner workspace
+	jsr	[OKiVec,U]	;* Kill worker and crystal
+;	puls	X		;* Restore work registers
+	PULS	X,PC
+;	rts
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 	PULLORG	ROMSAVE

@@ -28,10 +28,10 @@ stubs
 	ROUTINE	AMSini		;* For Bob
 	SLEEP	LOOP
 
-	ROUTINE	BombsAway	;* For Richs2			;;(Patched over by Z_BOMBSAWAY = $6D30)
-	nop
-	nop
-	rts
+;	ROUTINE	BombsAway	;* For Richs2			;;(Patched over by Z_BOMBSAWAY = $6D30)
+;	nop
+;	nop
+;	rts
 
 	ROUTINE	expobj
 	nop

@@ -383,4 +383,4 @@
 
 	PULLORG	ROMSAVE
 
-	INCLUDE "../WITT/GETLVX.ASM"		;* Velocity module for orbits
+;	INCLUDE "../WITT/GETLVX.ASM"		;* Velocity module for orbits

@@ -53,6 +53,9 @@ RHSCROLL EQU	$00F0
 	ldy	[OWSCON,Y]	;* Y -> scanner workspace
 				
 	jsr	upddtc		;* Update Distance To Caller (for caller).
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	CLRA
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;***
 ;*	Check mission type
 ;*
@@ -77,20 +80,26 @@ RHSCROLL EQU	$00F0
 ;***
 ;*	The shooting inhibitor is counted down until clear.
 ;***
-	ldu	OSSCWSA,Y	;* If the warrior is not on screen
-	beq	.11S		;*   then the inhibit counter is not affected.
-	lda	OLPOS,U		;* Check that the long screen
-	cmpa	#BHSCROLL	;*   position is within the
-	bls	.11S		;*   hard scrolling borders
-	cmpa	#THSCROLL	;*   at the top and bottom
-	bhs	.11S		;*   and exit if outside the range.
-	lda	OSPOS,U		;* Check that the short screen
-	cmpa	#LHSCROLL	;*   position is within the
-	bls	.11S		;*   hard scrolling borders
-	cmpa	#RHSCROLL	;*   at the left and right
-	bhs	.11S		;*   and exit if outside the range.
+;	ldu	OSSCWSA,Y	;* If the warrior is not on screen
+;	beq	.11S		;*   then the inhibit counter is not affected.
+;	lda	OLPOS,U		;* Check that the long screen
+;	cmpa	#BHSCROLL	;*   position is within the
+;	bls	.11S		;*   hard scrolling borders
+;	cmpa	#THSCROLL	;*   at the top and bottom
+;	bhs	.11S		;*   and exit if outside the range.
+;	lda	OSPOS,U		;* Check that the short screen
+;	cmpa	#LHSCROLL	;*   position is within the
+;	bls	.11S		;*   hard scrolling borders
+;	cmpa	#RHSCROLL	;*   at the left and right
+;	bhs	.11S		;*   and exit if outside the range.
 ;*
-	pshs	B		;* Save work registers
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	jsr	screenchk	;* If the craft is not on the screen
+	blo	.11S
+	
+	pshs	D
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;	pshs	B		;* Save work registers
 	lda	OSPERS,Y	;* The personality byte of the warrior reflects
 	tfr	A,B		;*   the shooting inhibitor status.
 	andb	#PWaShInhibit	;* If the inhibitor has already been cleared,
@@ -100,7 +109,10 @@ RHSCROLL EQU	$00F0
 	anda	#~(PWashIn)	;*   personality (leaving the rest of the		;;Fixme was: anda  #!N(PWashInhib)
 	ora	,S+		;*   traits unaffected, of course) and saved
 	sta	OSPERS,Y	;*   for the next time the warrior awakens.
-.10S	puls	B		;* Restore work registers
+;.10S	puls	B		;* Restore work registers
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+.10S	puls	D		;* Restore work registers
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 .11S	jsr	[B,X]		;* Start the mission.
 
 	puls	A,B,X,Y		;* Restore work registers
@@ -113,10 +125,10 @@ WarrMis
 	fdb	.120S		;* Attack player
 	fdb	.140S		;* Mine planet
 	fdb	.150S		;* Tail object
-	fdb	.160S		;* Intercept object
+;	fdb	.160S		;* Intercept object
 	fdb	.170S		;* Demo bombing run
 ;	PAD	OMWaLen-OMWaSave	;* Pad for additional missions, if any.
-	RMB	OMWaLen-OMWaSav
+;	RMB	OMWaLen-OMWaSav
 	ELSE
 	PUSHORG	WarrMis
 	fdb	.110S		;* Drift in space
@@ -564,29 +576,37 @@ WarrMis
 ;*	Nothing
 ;*
 ;*****
-.150S	jsr	think		;* Continue with the GUARDING mission
-	bcc	.151S		;*   only if cleared to think.
-	rts                     
+.150S	;jsr	think		;* Continue with the GUARDING mission
+;	bcc	.151S		;*   only if cleared to think.
+;	rts                     
 .151S	pshs	A,B,X,Y,U	;* Save work registers
 	ldx	[PlaIndex]	;* X -> scanner workspace of Player (for attack)
 	jsr	.111S		;* Animate for attack on player
-				
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	jsr	think		;* Continue with the GUARDING mission
+	bcc	.1511S		;*   only if cleared to think.
+	puls	A,B,X,Y,U	;* Restore work registers
+	rts 
+.1511S	
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 	lda	#OOrbit		;* Around the Sinistar take an "outer" orbit.
 	ldb	WarrOrbit	;*   using the direction of orbit from the
 ;*	nop			;*   personality of the keystone warrior.
 	ldx	[OSCWCR,Y]	;* X -> scanner workspace of caller (to orbit)
-	pshs	A,B,X		;* Save parameters for the SHORT computations.
+;	pshs	A,B,X		;* Save parameters for the SHORT computations.
 	jsr	getlodist	;* D = long orbital distance from the target
 	ldx	#stblguard	;* X -> speed table for warrior
 	jsr	newvel		;* D = velocity to achieve
 	jsr	updlvel		;* Update the long velocity
 ;*                              
-	puls	A,B,X		;* Restore parameters for SHORT computations.
-	jsr	getsodist	;* D = short orbital distance from the target
-	ldx	#stblguard	;* X -> speed table for warrior
-	jsr	newvel		;* D = velocity to achieve
-	jsr	updsvel		;* Update the short velocity
-	jmp	.100S		;* Attack player.
+;	puls	A,B,X		;* Restore parameters for SHORT computations.
+;	jsr	getsodist	;* D = short orbital distance from the target
+;	ldx	#stblguard	;* X -> speed table for warrior
+;	jsr	newvel		;* D = velocity to achieve
+;	jsr	updsvel		;* Update the short velocity
+;	jmp	.100S		;* Attack player.
 
 ;	SUBTTL	Warrior Intelligence - Intercept Mission
 ;*****
@@ -600,30 +620,42 @@ WarrMis
 ;*	Registers unchanged
 ;*
 ;*****
-.160S	pshs	A,B,X,Y,U	;* Save work registers
+.160S	;pshs	A,B,X,Y,U	;* Save work registers
 	ldx	[OSCWCR,Y]	;* X -> scanner workspace of target
-	jsr	.111S		;* Animate for attacking moving player.
-	jsr	think		;* Continue with the GUARDING mission
-	bcc	.161S		;*   only if cleared to think.
-.169S	puls	A,B,X,Y,U	;* Restore work registers
-	rts                     
-				
-.161S	jsr	getldist	;* D = long distance from the target
-	ldx	#stblW1		;* X -> speed table for warrior
-	jsr	newvel		;* D = velocity to achieve
-	jsr	updlvel		;* Update the long velocity
-				
-	ldx	[OSCWCR,Y]	;* X -> scanner workspace of caller
-	jsr	getsdist	;* D = short distance from the target
-	ldx	#stblW1		;* X -> speed table for warrior
+;	jsr	.111S		;* Animate for attacking moving player.
+;	jsr	think		;* Continue with the GUARDING mission
+;	bcc	.161S		;*   only if cleared to think.
+;.169S	puls	A,B,X,Y,U	;* Restore work registers
+;	rts     
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	lda	#OOrbit		;* Re-establish the attack orbit.
+	ldb	WarrOrbit	;* Use the direction of orbit from the
+;*	nop			;*   master orbit controller.
+
+	jsr	getsodist	;* D = short orbital distance from the target
+	ldx	#stblguard	;* X -> speed table for warrior
 	jsr	newvel		;* D = velocity to achieve
 	jsr	updsvel		;* Update the short velocity
-				
-	tst	AMDemo		;* In attract mode, don't shoot,
-	bne	.169S		;*   crystals are being picked up.
-				
-	ldx	[OSCWCR,Y]	;* X -> scanner workspace of target
-	jmp	.100S		;*   then it must be the player.  Attack!
+	jmp	.100S		;* Attack player
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;.161S	jsr	getldist	;* D = long distance from the target
+;	ldx	#stblW1		;* X -> speed table for warrior
+;	jsr	newvel		;* D = velocity to achieve
+;	jsr	updlvel		;* Update the long velocity
+;				
+;	ldx	[OSCWCR,Y]	;* X -> scanner workspace of caller
+;	jsr	getsdist	;* D = short distance from the target
+;	ldx	#stblW1		;* X -> speed table for warrior
+;	jsr	newvel		;* D = velocity to achieve
+;	jsr	updsvel		;* Update the short velocity
+;				
+;	tst	AMDemo		;* In attract mode, don't shoot,
+;	bne	.169S		;*   crystals are being picked up.
+;				
+;	ldx	[OSCWCR,Y]	;* X -> scanner workspace of target
+;	jmp	.100S		;*   then it must be the player.  Attack!
 
 ;	SUBTTL	Pseudo Warrior Intelligence - Demo Bombing Mission
 ;*****
@@ -638,8 +670,8 @@ WarrMis
 ;*
 ;*****
 .170S	pshs	A,B,X,Y,U	;* Save work registers
-	jsr	think		;* Continue with the GUARDING mission
-	bcs	.179S		;*   only if cleared to think.
+;	jsr	think		;* Continue with the GUARDING mission
+;	bcs	.179S		;*   only if cleared to think.
 ;* *	ldx	[PlaIndex]	;* X -> scanner workspace of Player (for attack)
 ;* *	tst	AMDemo		;* If not in attract mode,
 ;* *	beq	171$		;*   then the caller is correct.
@@ -647,45 +679,74 @@ WarrMis
 ;*	In attract mode, the player pretends to be this warrior and attacks
 ;*	the Sinistar as his psuedo caller.
 ;***
-	ldx	[SinIndex]	;* X -> scanner workspace of Sinistar to attack.
-	jsr	ReTarget
-	jsr	.111S		;* Animate for attack on player
 
-	lda	#IOrbit		;* Around the Sinistar take an "outer" orbit.
-	ldb	WarrOrbit	;*   using the direction of orbit from the
-;*	nop			;*   personality of the keystone warrior.
-	tfr	Y,X		;* Determine caller of warrior or pseudo-warrior
-	jsr	LdyWCR		;*   (as in attract demo) so that
-	exg	X,Y		;* X -> SW of caller and Y -> SW of callee.
-;*
-	pshs	A,B,X		;* Save parameters for the SHORT computations.
-	jsr	getlodist	;* D = long orbital distance from the target
-	ldx	#stblbomber	;* X -> speed table for psuedo warrior
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	;pshs	A,B,X,Y,U	;* Save work registers
+	ldx	[OSCWCR,Y]	;* X -> scanner workspace of target
+	jsr	.111S		;* Animate for attacking moving player.
+	jsr	think		;* Continue with the GUARDING mission
+	bcc	.1711S		;*   only if cleared to think.
+.1712S	puls	A,B,X,Y,U	;* Restore work registers
+	rts
+.1711S	
+	jsr	getldist	;* D = long distance from the target
+	ldx	#stblW1		;* X -> speed table for warrior
 	jsr	newvel		;* D = velocity to achieve
 	jsr	updlvel		;* Update the long velocity
-;*
-	puls	A,B,X		;* Restore parameters for SHORT computations.
-	jsr	getsodist	;* D = short orbital distance from the target
-	ldx	#stblbomber	;* X -> speed table for psuedo warrior
+				
+	ldx	[OSCWCR,Y]	;* X -> scanner workspace of caller
+	jsr	getsdist	;* D = short distance from the target
+	ldx	#stblW1		;* X -> speed table for warrior
 	jsr	newvel		;* D = velocity to achieve
 	jsr	updsvel		;* Update the short velocity
-;*
-;* *	tst	AMDemo		;* If not in attract mode,
-;* *	lbeq	100$		;*   normal shooting attack occurs.
-	ldx	[SinIndex]	;* X -> scanner workspace of Sinistar to attack.
-	jsr	UnTarget
-;***
-;*	In the attract mode demonstration release a bomb every couple seconds.
-;***
-	RANDOM	OSEED2,8,$FF	;* Clear the carry bit only once in a while,
-	bcs	.179S		;*   for the most part not being able to bomb.
-	lda	Bombs		;* If there are no bombs available to launch
-	beq	.179S		;*   when the time is right, then just exit.
-	jsr	screenchk	;* If the sinistar is not on screen			;;This gets patched over by MICA/BOBFIXES.SRC ($682B)
-	bcs	.179S		;*   then the player should not waste bombs.
-	jsr	BombsAway	;* Otherwise, release a bomb.
-.179S	puls	A,B,X,Y,U	;* Restore work registers
-	rts
+				
+	tst	AMDemo		;* In attract mode, don't shoot,
+	bne	.1712S		;*   crystals are being picked up.
+				
+	ldx	[OSCWCR,Y]	;* X -> scanner workspace of target
+	jmp	.100S		;*   then it must be the player.  Attack!
+	
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;	ldx	[SinIndex]	;* X -> scanner workspace of Sinistar to attack.
+;	jsr	ReTarget
+;	jsr	.111S		;* Animate for attack on player
+;
+;	lda	#IOrbit		;* Around the Sinistar take an "outer" orbit.
+;	ldb	WarrOrbit	;*   using the direction of orbit from the
+;;*	nop			;*   personality of the keystone warrior.
+;	tfr	Y,X		;* Determine caller of warrior or pseudo-warrior
+;	jsr	LdyWCR		;*   (as in attract demo) so that
+;	exg	X,Y		;* X -> SW of caller and Y -> SW of callee.
+;;*
+;	pshs	A,B,X		;* Save parameters for the SHORT computations.
+;	jsr	getlodist	;* D = long orbital distance from the target
+;;	ldx	#stblbomber	;* X -> speed table for psuedo warrior
+;	jsr	newvel		;* D = velocity to achieve
+;	jsr	updlvel		;* Update the long velocity
+;;*
+;	puls	A,B,X		;* Restore parameters for SHORT computations.
+;	jsr	getsodist	;* D = short orbital distance from the target
+;;	ldx	#stblbomber	;* X -> speed table for psuedo warrior
+;	jsr	newvel		;* D = velocity to achieve
+;	jsr	updsvel		;* Update the short velocity
+;;*
+;;* *	tst	AMDemo		;* If not in attract mode,
+;;* *	lbeq	100$		;*   normal shooting attack occurs.
+;	ldx	[SinIndex]	;* X -> scanner workspace of Sinistar to attack.
+;	jsr	UnTarget
+;;***
+;;*	In the attract mode demonstration release a bomb every couple seconds.
+;;***
+;	RANDOM	OSEED2,8,$FF	;* Clear the carry bit only once in a while,
+;	bcs	.179S		;*   for the most part not being able to bomb.
+;	lda	Bombs		;* If there are no bombs available to launch
+;	beq	.179S		;*   when the time is right, then just exit.
+;	jsr	screenchk	;* If the sinistar is not on screen			;;This gets patched over by MICA/BOBFIXES.SRC ($682B)
+;	bcs	.179S		;*   then the player should not waste bombs.
+;	jsr	BombsAway	;* Otherwise, release a bomb.
+;.179S	puls	A,B,X,Y,U	;* Restore work registers
+;	rts
 
 	PULLORG	ROMSAVE
 
@@ -715,10 +776,6 @@ WarrMis
 ;;   to patch over the old code with Sam's newer routine.  Because of this
 ;;   there are 6 garbage bytes Located at $6A6B-$6A70 that are the remains of
 ;;   the old routine.
-;;   
-;;   Interestingly, the AMOA '82 build and the final version of the game (V17)
-;;   both use Sam's WASHODDS so Witt's complete routine only exists in the
-;;   source code.
 ;;
 ;;   At first, I wasn't sure how ZWASHODD was patched into the ROM.  I eventually
 ;;   found the answer in WITT/AOE.ASM, where an INCLVER for RICH.SRC is located.
@@ -727,7 +784,7 @@ WarrMis
 ;;   Even though it's a patch, including it in RICH.SRC kinda makes things confusing
 ;;   so I'm including it here instead:
 ;;
-	INCLUDE "../WITT/ZWASHODD.ASM"		;* Shooting odds computations
+;	INCLUDE "../WITT/ZWASHODD.ASM"		;* Shooting odds computations
 ;;
 ;;   Changing WASHODDS to the older version does not appear to reduce the
 ;;   frequency of the warriors shooting at the player.

@@ -56,8 +56,8 @@ CLCOUNT	SET	0
 	COLLIDE	PLAYER,WORKER	;* Bounce
 	COLLIDE	PLAYER,WORKCR	;* Bounce
 	COLLIDE	PLAYER,WARRIOR	;* Bounce
-	tst	InWarp		;* During the warp,
-	lbne	rts		;*   player collisions are off!
+;	tst	InWarp		;* During the warp,
+;	lbne	rts		;*   player collisions are off!
 	COLLIDE	CRYSTAL,CRYSTAL	;* Bounce
 	COLLIDE	CRYSTAL,WORKCR	;* Bounce
 	COLLIDE	CRYSTAL,WARRIOR	;* Bounce
@@ -70,60 +70,63 @@ CLCOUNT	SET	0
 	JMP	BOUNCE
 	
 	COLLIDE	PLAYER,SINI	;* Player bounces until Sinistar built
-	tst	InWarp		;* During the warp,
-	lbne	rts		;*   player collisions are off!
+;	tst	InWarp		;* During the warp,
+;	lbne	rts		;*   player collisions are off!
 	ldd	Finish		;* Until the sinistar is built, the player
 	cmpd	#Alive		;*   bounces off pieces, but when built, the
 	lbne	PreBoY		;*   Sinistar can move in and eat the player.
 	tst	SinGrave	;* If the Sinistar is not dying
-	lbeq	SINIBITE1	;*   it can bite the player.			;;Fixme was: lbeq 1$
+;	lbeq	SINIBITE1	;*   it can bite the player.			;;Fixme was: lbeq 1$
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	LBEQ	DEATH
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	rts			;* Else, the player passes through.
 ;*	sorry			;* The ship cannot bounce off a dying Sinistar.
 ;***
 ;* Sinistars bites player
 ;***
-SINIBITE1 CLRD
-	STD	OLVEL,Y		;zero the sinistar velocity
-	STD	OSVEL,Y
-	STD	OLVEL+WPLAYER	;kill the players velocity
-	STD	OSVEL+WPLAYER
-	LDA	#8		;disable player controls
-	STA	PANMASK
-	CLR	RAPTIME
-	LDD	#CNULL		;disable player collisions
-	STD	OCHAR+WPLAYER
-	CLR	ASCINT		;interrupt any other speech
-	SPEAK	9		;roar and leave mouth open
-	NEW_SLEEP TASK1,.2S,OMTLEN+1
-	RADIX	10
-	LDA	#146		;close mouth after roar
-	RADIX	16
-	STA	OMTLEN,X
-	RTS
+;SINIBITE1 CLRD
+;	STD	OLVEL,Y		;zero the sinistar velocity
+;	STD	OSVEL,Y
+;	STD	OLVEL+WPLAYER	;kill the players velocity
+;	STD	OSVEL+WPLAYER
+;	LDA	#8		;disable player controls
+;	STA	PANMASK
+;	CLR	RAPTIME
+;	LDD	#CNULL		;disable player collisions
+;	STD	OCHAR+WPLAYER
+;	CLR	ASCINT		;interrupt any other speech
+;	SPEAK	9		;roar and leave mouth open
+;	NEW_SLEEP TASK1,.2S,OMTLEN+1
+;	RADIX	10
+;	LDA	#146		;close mouth after roar
+;	RADIX	16
+;	STA	OMTLEN,X
+;	RTS
 ;* spin player
-.2S	LDA	SINGRAVE	;it sinistar still alive?
-	BNE	.4S
-	FRANDOM	OSEED1,BYTE	;yes, give player a random angle
-	STA	PLYRANG
-	CLR 	INSTUN		;can't stun an eating sinistar
-	LDX	[SININDEX]	;tell sinistar to attack full speed
-	LDA	OSPERS,X
-	ANDA	#~PSINIINHIBIT				;;Fixme was: #!NPSINIINHIBIT
-	STA	OSPERS,X
-	DEC	OMTLEN,Y	;done roaring?
-	BEQ	.3S
-	SLEEP	LOOP
-.3S	CLR	ASCINT		;yes, close mouth no matter what
-	RADIX	10
-	SPEAK	10		
-	RADIX	16
-	LDD	#CPLAYER	;make player again for explosion
-	STD	OCHAR+WPLAYER
-	JSR	DEATH		;kill player
-	BRA	.5S
-.4S	LDA	#0F		;re-enable player controls
-	STA	PANMASK
-.5S	JMP	DIE
+;.2S	LDA	SINGRAVE	;it sinistar still alive?
+;	BNE	.4S
+;	FRANDOM	OSEED1,BYTE	;yes, give player a random angle
+;	STA	PLYRANG
+;	CLR 	INSTUN		;can't stun an eating sinistar
+;	LDX	[SININDEX]	;tell sinistar to attack full speed
+;	LDA	OSPERS,X
+;	ANDA	#~PSINIINHIBIT				;;Fixme was: #!NPSINIINHIBIT
+;	STA	OSPERS,X
+;	DEC	OMTLEN,Y	;done roaring?
+;	BEQ	.3S
+;	SLEEP	LOOP
+;.3S	CLR	ASCINT		;yes, close mouth no matter what
+;	RADIX	10
+;	SPEAK	10		
+;	RADIX	16
+;	LDD	#CPLAYER	;make player again for explosion
+;	STD	OCHAR+WPLAYER
+;	JSR	DEATH		;kill player
+;	BRA	.5S
+;.4S	LDA	#0F		;re-enable player controls
+;	STA	PANMASK
+;.5S	JMP	DIE
 
 ;*****
 ;*
@@ -139,13 +142,13 @@ SINIBITE1 CLRD
 ;*
 ;*****
 	COLLIDE	PLAYER,CRYSTAL	;* Player picks up crystal.
-	jsr	AddBomb		;* Add a bomb to the bombbay display, if ok.
-	ldx	[OScan,Y]	;* Kill off the
-	ldu	OSChar,X	;*   cyrstal as if
-	jsr	[OKiVec,U]	;*   bringing it inside the ship.
-	ldd	#$200		;* Score a few points
-	jsr	addscore	;*   for collecting the crystal.
-	rts
+;	jsr	AddBomb		;* Add a bomb to the bombbay display, if ok.
+;	ldx	[OScan,Y]	;* Kill off the
+;	ldu	OSChar,X	;*   cyrstal as if
+;	jsr	[OKiVec,U]	;*   bringing it inside the ship.
+;	ldd	#$200		;* Score a few points
+;	jsr	addscore	;*   for collecting the crystal.
+;	rts
 ;*****
 ;*
 ;* ADDBOMB
@@ -158,7 +161,7 @@ SINIBITE1 CLRD
 ;*
 ;*****
 	ROUTINE	AddBomb
-	pshs	A,B,X,Y		;* Save work registers.
+;	pshs	A,B,X,Y		;* Save work registers.
 	LDA	BOMBS		;* If the Sinibomb count was zero,
 	bne	.1S		;*   the "EMPTY" message in the bomb
 	jsr	NotEmpty	;*   display area must be erased.
@@ -167,17 +170,40 @@ SINIBITE1 CLRD
 	ble	ADDB2S	;*   then another bomb is manufactured.			;;Fixme was: ble .2S
 ;*
 	TUNE	QFulCr		;* Else, signal crystal pick up for warp engines
+	
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	PSHS	Y,X				;; AMOA
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 	DISPLAY	GREY
-	PHRASE	GREY,35,CRYSTAL,SAVED
+;	PHRASE	GREY,35,CRYSTAL,SAVED
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	PHRASE	GREY,35,CRYSTALS,SAVED		;; AMOA
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 	PHRASE	GREY,35,FOR,WARP,ENGINES
+	
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	PULS	Y,X				;; AMOA
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 	bra	ADDB3S								;;Fixme was: bra .3S
 ;*
 ADDB2S TUNE	QPlayCr		;* Signal another crystal picked up for bomb-bay
 	sta	Bombs		;* Save new sinibomb count
 	ldb	#DWBL		;* Get DMA constant to write to sinibomb display
 	jsr	UpBombs		;* Update sinibomb display, save Y, uses A
-ADDB3S	puls	A,B,X,Y		;* Restore work registers.
+ADDB3S	;puls	A,B,X,Y		;* Restore work registers.
+	;rts
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	ldx	[OScan,Y]	;* Kill off the				;; AMOA
+	ldu	OSChar,X	;*   cyrstal as if
+	jsr	[OKiVec,U]	;*   bringing it inside the ship.
+	ldd	#$200		;* Score a few points
+	jsr	addscore	;*   for collecting the crystal.
 	rts
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;	TABLE	QFulCr
 QFulCr	_IPrio	21		;* Tune for picking up last and latter crystals
@@ -190,7 +216,7 @@ QFulCr	_IPrio	21		;* Tune for picking up last and latter crystals
 ROMSAVE	SET	*		;; Save the current address
 
 	ORG	PHRSAV		;; Jump over to PHRSAV to save our pointers
-	FDB	_CRYSTAL
+;	FDB	_CRYSTAL
 	FDB	_SAVED		
 	FDB	_FOR
 	FDB	_WARP
@@ -251,8 +277,8 @@ PHRSAV	SET	*		;; Mark the new address for PHRSAV to add
 
 ;* shoot player
 	COLLIDE	PLAYER,WASHOT	;* Player death
-	tst	InWarp		;* During the warp,
-	lbne	rts		;*   player collisions are off!
+;	tst	InWarp		;* During the warp,
+;	lbne	rts		;*   player collisions are off!
 	leax	Y		;* Kill off
 	jsr	killobj		;*   warrior shot.
 	jsr	DEATH		;* Kill player ship.
@@ -288,10 +314,10 @@ CRYWO1S	TUNE	QWorkCr		;* Play a tune when worker picks up a crystal
 ;*                               
 ;	LOCAL                   
 	COLLIDE	PLAYER,PLANET	;* Vib. Bounce
-	tst	InWarp		;* During the warp,
-	lbne	rts		;*   player collisions are off!
-	lda	#1		;* Zap the court check
-	sta	WECheck		;*   variable to help prevent detection.
+;	tst	InWarp		;* During the warp,
+;	lbne	rts		;*   player collisions are off!
+;	lda	#1		;* Zap the court check
+;	sta	WECheck		;*   variable to help prevent detection.
 	COLLIDE	CRYSTAL,SINI	;* Vib. Bounce
  	COLLIDE	WORKER,SINI	;* Vib. Bounce
 	COLLIDE	WARRIOR,SINI	;* Vib. Bounce
@@ -375,14 +401,19 @@ BOUNCER	pshs	X		;* Save first object WS				;;Fixme was: 1$ (can't use local labe
 	ldd	#$500		;* Score points
 	jsr	addscore	;*   for killing the warrior.
 SBOMB1S	DISPLAY	YELLOW
-	PHRASE	YELLOW,35,SINIBOMB
+;	PHRASE	YELLOW,35,SINIBOMB
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	PHRASE	YELLOW,35,SINIBOMBS
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 	PHRASE	YELLOW,35,INTERCEPTED
 	rts
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ROMSAVE	SET	*		;; Save the current address
 
 	ORG	PHRSAV		;; Jump over to PHRSAV to save our pointers
-	FDB	_SINIBOMB
+;	FDB	_SINIBOMB
 	FDB	_INTERCEPTED
 
 PHRSAV	SET	*		;; Mark the new address for PHRSAV to add

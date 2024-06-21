@@ -140,7 +140,12 @@
 	ldu	OSChar,X	;* Kill the
 	jsr	[OKiVec,U]	;*   sinibomb.
 	DISPLAY	YELLOW
-	PHRASE	YELLOW,35,SINIBOMB
+;	PHRASE	YELLOW,35,SINIBOMB
+	
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	PHRASE	YELLOW,35,SINIBOMBS
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 	PHRASE	YELLOW,35,INTERCEPTED
 SB14S	puls	A,B,X,Y,U	;* Restore work registers			;;Fixme was: 14$  puls	A,B,X,Y,U
 	rts

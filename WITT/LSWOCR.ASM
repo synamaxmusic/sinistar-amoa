@@ -2,6 +2,11 @@
 ; EQUs to remove later
 ;ADDPART EQU	$5D7B	;ADDPART
 ;===============================================================================
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	INCLUDE "../WITT/ADDPART.ASM"		;* Build up the sinistar
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 	PUSHORG	ROMSAVE
 ;*****
 ;*
@@ -36,4 +41,4 @@
 
 	PULLORG	ROMSAVE
 
-	INCLUDE "../WITT/ADDPART.ASM"		;* Build up the sinistar
+;	INCLUDE "../WITT/ADDPART.ASM"		;* Build up the sinistar
