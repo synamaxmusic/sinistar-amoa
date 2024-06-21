@@ -71,6 +71,10 @@ TRASCOM	LDX	TRASBUB		;get trash compactor bubble  > uses A,B,X,U
 	STA	MEMCTL
 .6S	LDA	FREE		;need more space?
 	BPL	.7S
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;				;; AMOA edit
+	LDA	#$3F
+	STA	PCRAM
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	LDX	LDEAL		;yes?, get lowest trash block
 	CMPX	#DYNEND		;is there new trash?
 	LBLO	TRASCOM

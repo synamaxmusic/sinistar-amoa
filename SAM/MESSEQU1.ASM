@@ -12,7 +12,10 @@ TSTORG	EQU	$F000	;The rom area for the $F000 test rom (4k block)
 ;*TSBORG	EQU	$3000	;Location of the AUDITING and CMOS handling routines,
 ;*				;(~4K bytes -works with TSTORG block above).
 MESS1	EQU	$E200	;Address of Message and character routines.
-MESS2	EQU	$8EA0	;Address of Message and character data.
+;MESS2	EQU	$8EA0	;Address of Message and character data.
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+MESS2	EQU	$8EB0	;Address of Message and character data.
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 RAMALS	EQU	$BF01	;Ram area for all modules -must be sacred (49 BYTES)
 ;*
 ;* * * * * * * * * * * END OF CHANGABLE EQUATES  * * * * * * * * * * * * * * *
@@ -127,7 +130,7 @@ SPECFN	RMB	2	;RESTORE FACTORY SETTINGS
 	RMB	2	;CLEAR AUDIT TOTALS
 	RMB	2	;INITIALIZE HIGH SCORE TABLE
 	RMB	2	;INTIATE AUTO CYCLE
-	RMB	2	;ENTER ATTRACT MODE MESSAGE
+;	RMB	2	;ENTER ATTRACT MODE MESSAGE
 ENDADJ	EQU	*
 OPL1	RMB	2
 OPL2	RMB	2

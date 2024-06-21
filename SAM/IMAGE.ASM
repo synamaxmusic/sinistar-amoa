@@ -422,8 +422,8 @@ IPLAY32	FCB	$06,$46,$A0,$00,$00,$00
 
 ;* sinibombs
 ISBOMB	FDB	$0305,ISBOMB2,ISBOMB1,$0202,$0305,ISBOMB3,ISBOMB1,$0202,$0305,IDSBOMB,ISBOMB1,$0202
-ISBOMB1	FCB	1,0,0,0,1
-	FCB	4,5,5,5,4
+;ISBOMB1	FCB	1,0,0,0,1
+;	FCB	4,5,5,5,4
 ISBOMB2	FCB	$09,$92,$00
 	FCB	$29,$B9,$90
 	FCB	$9B,$BB,$90
@@ -439,6 +439,10 @@ IDSBOMB FCB	$02,$99,$00
 	FCB	$9F,$1F,$90
 	FCB	$29,$F9,$90
 	FCB	$09,$92,$00
+;;;;;;;;;;;;;;;;;;;;;;;;				;; AMOA edit
+ISBOMB1	FCB	1,0,0,0,1
+	FCB	4,5,5,5,4
+;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;* planetoids
 

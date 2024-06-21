@@ -13,7 +13,10 @@ ADJUP	EQU	$01		;GAME ADJUST MOVE UP MENU
 ADJINC	EQU	$10		;GAME ADJUST INCREMENT VALUE
 ADJDEC	EQU	$20		;GAME ADJUST DECREMENT VALUE
 AEND	EQU	$7818		;GAME ADJUST TOP OF PAGE
-ATOP	EQU	AEND-(17*5)*256	;GAME ADJUST BOTTOM OF PAGE
+;ATOP	EQU	AEND-(17*5)*256	;GAME ADJUST BOTTOM OF PAGE
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ATOP	EQU	AEND-(16*5)*256	;GAME ADJUST BOTTOM OF PAGE
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 COLNBR	EQU	$C4		;GAME ADJ - START COLUMN OF NUMBER FIELD
 LOCFRE	EQU	AEND-5*6*256+$80	;LOCATION OF "FREE PLAY" MESSAGE
 COLNBB	EQU	COLNBR-2*6	;BOOKS - START COLUMN OF NUMBER FIELD
@@ -463,24 +466,46 @@ ROMER3	LDY	#CKCMOS	;NOW TRY AND RUN THE GAME
 ;*	RESULTING SUM.	IF SUM=0 THEN PART IS NOT STUFFED.
 
 	IF DEBUG = 0	;FOR ROM VERSION				;;Fixme was: IFE 	DEBUG
-ROMTAB	FCB	$00,$C6	;0000                                           ;;Fixme was: FCB	$00,$A2	
-	FCB	$10,$62	;1000                                           ;;Fixme was: FCB	$10,$A9	
-	FCB	$20,$20	;2000                                           ;;Fixme was: FCB	$20,$50	
-	FCB	$30,$33	;3000                                           ;;Fixme was: FCB	$30,$EB	
-	FCB	$40,$EF	;4000                                           ;;Fixme was: FCB	$40,$A7	
-	FCB	$50,$FC	;5000                                           ;;Fixme was: FCB	$50,$3E	
-	FCB	$60,$1A	;6000                                           ;;Fixme was: FCB	$60,$22	
-	FCB	$70,$59	;7000                                           ;;Fixme was: FCB	$70,$B4	
-	FCB	$80,$2A	;8000                                           ;;Fixme was: FCB	$80,$E1	
-	FCB	$90,$0	;9000                                           ;;Fixme was: FCB	$90,$0	
-	FCB	$A0,$0	;A000                                           ;;Fixme was: FCB	$A0,$0	
-	FCB	$B0,$0	;B000                                           ;;Fixme was: FCB	$B0,$0	
-	FCB	$C0,$0	;C000                                           ;;Fixme was: FCB	$C0,$0	
-	FCB	$D0,$0	;D000                                           ;;Fixme was: FCB	$D0,$06	
-	FCB	$E0,$F8	;E000                                           ;;Fixme was: FCB	$E0,$17	
-	FCB	$F0,$57	;F000                                           ;;Fixme was: FCB	$F0,$77	
-ROMEND	FCB	0                                                       ;;Fixme was: FCB	0
-	FCB	$00	;CHECK BYTE (FUDGER) FOR THIS PART ($F000)      ;;Fixme was: FCB	$FC	
+
+;ROMTAB	FCB	$00,$C6	;0000                                           ;;Fixme was: FCB	$00,$A2	
+;	FCB	$10,$62	;1000                                           ;;Fixme was: FCB	$10,$A9	
+;	FCB	$20,$20	;2000                                           ;;Fixme was: FCB	$20,$50	
+;	FCB	$30,$33	;3000                                           ;;Fixme was: FCB	$30,$EB	
+;	FCB	$40,$EF	;4000                                           ;;Fixme was: FCB	$40,$A7	
+;	FCB	$50,$FC	;5000                                           ;;Fixme was: FCB	$50,$3E	
+;	FCB	$60,$1A	;6000                                           ;;Fixme was: FCB	$60,$22	
+;	FCB	$70,$59	;7000                                           ;;Fixme was: FCB	$70,$B4	
+;	FCB	$80,$2A	;8000                                           ;;Fixme was: FCB	$80,$E1	
+;	FCB	$90,$0	;9000                                           ;;Fixme was: FCB	$90,$0	
+;	FCB	$A0,$0	;A000                                           ;;Fixme was: FCB	$A0,$0	
+;	FCB	$B0,$0	;B000                                           ;;Fixme was: FCB	$B0,$0	
+;	FCB	$C0,$0	;C000                                           ;;Fixme was: FCB	$C0,$0	
+;	FCB	$D0,$0	;D000                                           ;;Fixme was: FCB	$D0,$06	
+;	FCB	$E0,$F8	;E000                                           ;;Fixme was: FCB	$E0,$17	
+;	FCB	$F0,$57	;F000                                           ;;Fixme was: FCB	$F0,$77	
+;ROMEND	FCB	0                                                       ;;Fixme was: FCB	0
+;	FCB	$00	;CHECK BYTE (FUDGER) FOR THIS PART ($F000)      ;;Fixme was: FCB	$FC	
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;	
+ROMTAB	FCB	$00,$31	;0000
+	FCB	$10,$62	;1000
+	FCB	$20,$6C	;2000
+	FCB	$30,$BB	;3000
+	FCB	$40,$71	;4000
+	FCB	$50,$5F	;5000
+	FCB	$60,$DF	;6000
+	FCB	$70,$1B	;7000
+	FCB	$80,$E5	;8000
+	FCB	$90,$0	;9000
+	FCB	$A0,$0	;A000
+	FCB	$B0,$0	;B000
+	FCB	$C0,$0	;C000
+	FCB	$D0,$0	;D000
+	FCB	$E0,$69	;E000
+	FCB	$F0,$04	;F000
+ROMEND	FCB	0            
+	FCB	$00	;CHECK BYTE (FUDGER) FOR THIS PART ($F000)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;*
       ELSE			;FOR DECON DEBUGGING
 ;*
@@ -1662,7 +1687,10 @@ CWRET	LDB	#$22
 	CLRA
 	JMP	JNAP
 
-MINMAX	FCB	$01,$99
+;MINMAX	FCB	$01,$99
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+MINMAX	FCB	$00,$99
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	FCB	$00,$99
 	FCB	$01,$99
 	FCB	$00,$09
@@ -1679,7 +1707,7 @@ MINMAX	FCB	$01,$99
 	FCB	$00,$01
 	FCB	$00,$01
 	FCB	$00,$01
-	FCB	$00,$01
+;	FCB	$00,$01
 
 OUTCMOS	TFR	U,D
 	LSRB
@@ -1748,7 +1776,7 @@ SPECAL	FCB	SPEC+NOREPLC
 	FCB	SPEC
 	FCB	SPEC
 	FCB	SPEC
-	FCB	SPEC
+;	FCB	SPEC
 ;*
 PRICOUT	PSHS	D,U,X,Y
 	LDX	#CSELCT
@@ -1966,13 +1994,18 @@ IRQVectors								;;(New label for checking if DIAG/T13 is assembled or not)
 ;;
 ;;  To make ROM 11 match up perfectly, this one byte is needed at $FFDF.  I think
 ;;  it's some sort of checksum byte; in the Revision 2 rom, it's $DF instead of $DA.
-;;  It's missing entirely in the AMOA build.
+;;  It's been moved to $FFE2 in the AMOA build.
 ;;
 ;;  Also, P2BIN has to have -l 00 in the command line for building ROM 11.
 ;;  THere's unused bytes here that need to be filled in with $00 not $FF. 
 ;;
 ;;===============================================================================	
-	PUSHORG	$FFDF		
-	FCB	$DA
+;	PUSHORG	$FFDF		
+;	FCB	$DA
+;	PULLORG
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	PUSHORG	$FFE2
+	FCB	$54
 	PULLORG
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;===============================================================================

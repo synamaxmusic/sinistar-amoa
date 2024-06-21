@@ -52,7 +52,10 @@ CPLAN1	FDB	8000		;collision mask
 	FDB	IPLAN1		;first image descriptor
 	FDB	SCROFF		;offscreen routine
 	FDB	VSCRON		;onscreen routine
-	FDB	TRAP		;vector to leave-sector routine
+;	FDB	TRAP		;vector to leave-sector routine
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	FDB	AMOALeaveSector	;vector to leave-sector routine
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	fdb	0		;* Index to scanner object CD Table
 	fcb	OSDPLen		;scanner workspace length
 	FCB	3		;scanner height
@@ -74,7 +77,10 @@ CPLAN2	FDB	8000		;collision mask
 	FDB	IPLAN2		;first image descriptor
 	FDB	SCROFF		;offscreen routine
 	FDB	VSCRON		;onscreen routine
-	FDB	TRAP		;vector to leave-sector routine
+;	FDB	TRAP		;vector to leave-sector routine
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	FDB	AMOALeaveSector	;vector to leave-sector routine
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	fdb	0		;* Index to scanner object CD Table
 	fcb	OSDPLen		;scanner workspace length
 	FCB	3		;scanner height
@@ -96,7 +102,10 @@ CPLAN3	FDB	8000		;collision mask
 	FDB	IPLAN3		;first image descriptor
 	FDB	SCROFF		;offscreen routine
 	FDB	VSCRON		;onscreen routine
-	FDB	TRAP		;vector to leave-sector routine
+;	FDB	TRAP		;vector to leave-sector routine
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	FDB	AMOALeaveSector	;vector to leave-sector routine
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	fdb	0		;* Index to scanner object CD Table
 	fcb	OSDPLen		;scanner workspace length
 	FCB	2		;scanner height
@@ -118,7 +127,10 @@ CPLAN4	FDB	8000		;collision mask
 	FDB	IPLAN4		;first image descriptor
 	FDB	SCROFF		;offscreen routine
 	FDB	VSCRON		;onscreen routine
-	FDB	TRAP		;vector to leave-sector routine
+;	FDB	TRAP		;vector to leave-sector routine
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	FDB	AMOALeaveSector	;vector to leave-sector routine
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	fdb	0		;* Index to scanner object CD Table
 	fcb	OSDPLen		;scanner workspace length
 	FCB	3		;scanner height
@@ -140,7 +152,10 @@ CPLAN5	FDB	8000		;collision mask
 	FDB	IPLAN5		;first image descriptor
 	FDB	SCROFF		;offscreen routine
 	FDB	VSCRON		;onscreen routine
-	FDB	TRAP		;vector to leave-sector routine
+;	FDB	TRAP		;vector to leave-sector routine
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	FDB	AMOALeaveSector	;vector to leave-sector routine
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	fdb	0		;* Index to scanner object CD Table
 	fcb	OSVCLen		;scanner workspace length
 	FCB	4		;scanner height
@@ -184,7 +199,10 @@ CWORKER	FDB	8000		;collision mask
 	FDB	IWORKER		;first image descriptor
 	FDB	SCROFF		;offscreen routine
 	FDB	VSCRON		;onscreen routine
-	FDB	TRAP		;vector to leave-sector routine
+;	FDB	TRAP		;vector to leave-sector routine
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	FDB	AMOALeaveSector	;vector to leave-sector routine
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	fdb	0		;* Index to scanner object CD Table
 	fcb	OSWWLen		;scanner workspace length
 	FCB	1		;scanner height
@@ -204,7 +222,10 @@ CWARRIO	FDB	8000		;collision mask
 	FDB	IWARRIO		;first image descriptor
 	FDB	SCROFF		;offscreen routine
 	FDB	VSCRON		;onscreen routine
-	FDB	TRAP		;vector to leave-sector routine
+;	FDB	TRAP		;vector to leave-sector routine
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	FDB	AMOALeaveSector	;vector to leave-sector routine
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	fdb	0		;* Index to scanner object CD Table
 	fcb	OSWWLen		;scanner workspace length
 	FCB	2		;scanner height
@@ -223,8 +244,12 @@ CSINI	FDB	8000		;collision mask
 	FCB	0FF		;object mass
 	FDB	ISINI		;first image descriptor
 	FDB	SCROFF		;offscreen routine
-	FDB	VSCRON		;onscreen routine
-	FDB	TRAP		;vector to leave-sector routine
+;	FDB	VSCRON		;onscreen routine
+;	FDB	TRAP		;vector to leave-sector routine
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	FDB	AMOASiniStun	;onscreen routine
+	FDB 	LSSINI		;vector to leave-sector routine
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	fdb	0		;* Index to scanner object CD Table
 	fcb	OSVCLen		;scanner workspace length
 	FCB	6		;scanner height
@@ -264,7 +289,10 @@ CCRYSTA	FDB	8000		;collision mask
 	FDB	ICRYSTA		;first image descriptor
 	FDB	SCROFF		;offscreen routine
 	FDB	CRYON		;onscreen routine
-	FDB	TRAP		;vector to leave-sector routine
+;	FDB	TRAP		;vector to leave-sector routine
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	FDB	AMOALeaveSector	;vector to leave-sector routine
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	fdb	0		;* Index to scanner object CD Table
 	fcb	OSWCLen		;scanner workspace length
 	FCB	0		;scanner height
@@ -306,7 +334,10 @@ CPIECE	FDB	8000		;collision mask
 	FDB	IMANGLE		;first image descriptor
 	FDB	TRAP		;offscreen routine
 	FDB	TRAP		;onscreen routine
-	FDB	TRAP		;vector to leave-sector routine
+;	FDB	TRAP		;vector to leave-sector routine
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	FDB	AMOALeaveSector	;vector to leave-sector routine
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	fdb	0		;* Index to scanner object CD Table
 	fcb	OSCLEN		;scanner workspace length
 	FCB	1		;scanner height

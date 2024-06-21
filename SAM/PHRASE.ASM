@@ -265,9 +265,15 @@ MSDJ	FCC	"GAME ADJUSTMENTS"
 MSXTR	FCC	"FIRST EXTRA SHIP AT"
 	RORG -1
 	FCB CT+CEND
-MSNCR	FCC	"ADDITIONAL EXTRA SHIP POINT FACTOR"
+;MSNCR	FCC	"ADDITIONAL EXTRA SHIP POINT FACTOR"
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+MSNCR	FCC	"ADDITIONAL POINTS PER EXTRA SHIP"
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	RORG -1
-	FCB CR+CEND
+;	FCB CR+CEND
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	FCB CP+CEND
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 MS1CR	FCC	"SHIPS PER GAME"
 	RORG -1
 	FCB CE+CEND
@@ -313,9 +319,9 @@ MSHGH	FCC	"HIGH SCORE TABLE RESET"
 MSAT	FCC	"AUTO CYCLE"
 	RORG -1
 	FCB CE+CEND
-MSSTA	FCC	"SET ATTRACT MODE MESSAGE"
-	RORG -1
-	FCB CE+CEND
+;MSSTA	FCC	"SET ATTRACT MODE MESSAGE"		;; Attract Mode Message is not in AMOA build.
+;	RORG -1
+;	FCB CE+CEND
 MSSDJ	FCC	"USE 'MOVE' TO SELECT "
 	RORG -1
 	FCB CSPC+CEND
@@ -403,7 +409,7 @@ PHRASE	FDB	INDIC	;'INITIAL TESTS INDICATE'
 	FDB	MSAVTM	;'AVERAGE TIME PER CREDIT'
 	FDB	MSDJ	;'GAME ADJUSTMENTS'
 	FDB	MSXTR	;'FIRST EXTRA SHIP AT'
-	FDB	MSNCR	;'ADDITIONAL EXTRA SHIP POINT FACTOR'
+	FDB	MSNCR	;'ADDITIONAL EXTRA SHIP POINT FACTOR'	;;"ADDITIONAL POINTS PER EXTRA SHIP" in AMOA
 	FDB	MS1CR	;'SHIPS PER GAME'
 	FDB	MSDFF	;'DIFFICULTY OF PLAY'
 	FDB	MSCFI	;'CONTINUOUS FIRE'
@@ -419,7 +425,7 @@ PHRASE	FDB	INDIC	;'INITIAL TESTS INDICATE'
 	FDB	MSCLR	;'CLEAR BOOKKEEPING TOTALS'
 	FDB	MSHGH	;'HIGH SCORE TABLE RESET'
 	FDB	MSAT	;'AUTO CYCLE'
-	FDB	MSSTA	;'SET ATTRACT MODE MESSAGE'
+;	FDB	MSSTA	;'SET ATTRACT MODE MESSAGE'	;; Attract Mode Message is not in AMOA build.
 	FDB	MSSDJ	;'USE 'MOVE' TO SELECT '
 	FDB	MSCDJ	;'USE 'FIRE-SINIBOMB' BUTTONS TO CHANGE THE VALUE'
 	FDB	YES	;'YES'
@@ -529,13 +535,7 @@ AJUST	FDB	$8543		;GAME ADJUST HEADER
 	FCB	$99
 	FCB	MSADJ+CEND
 
-	PULLORG	MESS1END
-				;*********
-;*********************************	*********************************
-;*			   ROM RE-ORGANIZATION				*
-;*********************************	*********************************
-	PUSHMORG MESS2		;*********
-
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 BADJ	FDB	$183E		;GAME ADJUST TRAILER
 	FCB	$BB
 	FCB	MSSADJ
@@ -548,6 +548,27 @@ BADJ	FDB	$183E		;GAME ADJUST TRAILER
 	FDB	$0E52
 	FCB	$11
 	FCB	MSEXIT+CEND
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+	PULLORG	MESS1END
+				;*********
+;*********************************	*********************************
+;*			   ROM RE-ORGANIZATION				*
+;*********************************	*********************************
+	PUSHMORG MESS2		;*********
+
+;BADJ	FDB	$183E		;GAME ADJUST TRAILER
+;	FCB	$BB
+;	FCB	MSSADJ
+;	FDB	$0
+;	FCB	$BB
+;	FCB	MSAJM
+;	FDB	$131D
+;	FCB	$44
+;	FCB	MSCADJ
+;	FDB	$0E52
+;	FCB	$11
+;	FCB	MSEXIT+CEND
 
 IMES	FDB	$4C3E		;POWER-UP PROTECTED CMOS CHECKSUM FAILURE
 	FCB	$22

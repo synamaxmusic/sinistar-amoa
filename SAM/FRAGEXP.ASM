@@ -39,7 +39,10 @@
 	JSR	SINCOS		;compute a unit vector
 	PSHS	D		;save it
 	RANDOM	OSEED2,9,3	;get a random radius (within a range)
-	CMPY	#WPLAYER	;is object player?
+;	CMPY	#WPLAYER	;is object player?
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;				;; AMOA edit
+	CMPX	#WPLAYER	;is object player?
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	BNE	.3S              
 	LSRA			;yes, divide radius by two
 .3S	PULS	B		;multiply radius by unit vector

@@ -435,28 +435,39 @@ VSCRON	WAKE_AT	.1S		;change wake-up addr for on screen scanner loop
 	JSR	DRWSCAN		;draw scanner image   save Y, uses A,B,X
 	SLEEP	LOOP
 
-;* update scanner position on screen
+;* update scanner position on screen					;; This routine was changed quite a bit after AMOA
 UPSCAN	LDU	OSCHAR,Y	;characteristics in U > uses A,B,X,U
 	LDX	OSSCWSA,Y	;screen wsa in X
 	LDB	OSPOS+WPLAYER	;compute s position relative to player
 	LSRB
-	LSRB
+;	LSRB								;; These LSRBs were added later
 	STB	TEMP
 	LDB	OSPOS,X
 	LSRB
-	LSRB
+;	LSRB
 	LDA	OSTATUS,X	;correct for left clip
 	BPL	.1S
-	ADDB	#$C0
+;	ADDB	#$C0
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	ADDB	#$80							;; #$80 was changed to #$C0
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 .1S	SUBB	TEMP
-	LDA	OLPOS+WPLAYER	;compute l position relative to player
-	LSRA
-	STA	TEMP
+;	LDA	OLPOS+WPLAYER	;compute l position relative to player
+;	LSRA
+;	STA	TEMP
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	ASRB
+	ADDB	OSCWIDE,U						;; correct for scanner width
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	LDA	OLPOS,X
-	ADDA	#$50
-	LSRA
-	SUBA	#$50>>1							;;Fixme was: SUBA #50!>1
-	SUBA	TEMP
+;	ADDA	#$50
+;	LSRA
+;	SUBA	#$50>>1							;;Fixme was: SUBA #50!>1
+;	SUBA	TEMP
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	SUBA	OLPOS+WPLAYER
+	ASRA
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	ADDA	OSCHIGH,U	;correct for height
 	STD	OSLPOS,Y	;save new position
 	RTS

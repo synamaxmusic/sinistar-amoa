@@ -43,8 +43,8 @@
 	STA	DCTRL
 .2S	LDX	[SININDE]	;get sinistar scanner workspace address in X
 	LDD	OSLPOS,X	;yes?,get scanner position of sinistar
-	TST	OSSCWSA,X	;is sinistar on screen?
-	BEQ	.3S
+;	TST	OSSCWSA,X	;is sinistar on screen?
+;	BEQ	.3S
 	ADDA	SINILN		;yes, add offset of dead piece
 	ADDB	SINISN
 .3S	NEW_SCAN CPIECE		;create piece object

@@ -77,7 +77,7 @@
 	BNE	.5S
 	RTS			;yes?, stop here
 ;*
-.5S	CLR	PLACCEL		;zero player acceleration
+.5S	;CLR	PLACCEL		;zero player acceleration
 	LDD	#$2222		;draw player scanner image
 	STD	$8180
 	ENDSECTION SCANPANEL
@@ -158,13 +158,17 @@ SCAN3S	LDB	ZONECOL		;get zone color
 	TFR	A,B		;get product into B
 	ADDA	PLYRANG		;rotate ship
 	STA	PLYRANG		;save new rotation angle
-	JSR	SINCOS		;compute players unit vector
-	STD	PLSUNIT		;save players unit vector
+;	JSR	SINCOS		;compute players unit vector
+;	STD	PLSUNIT		;save players unit vector
 	LDB	TEMP		;check angle from joystick to player ship
 	ADDB	#$20             
 	CMPB	#$40             
 	BHS	SCROLL		;to great?, skip acceleration
-	LDB	PLLUNIT		;accelerate player:  get l unit vector
+;	LDB	PLLUNIT		;accelerate player:  get l unit vector
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	JSR	$47C2
+	PSHS	A
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	SEX			;get l component of unit vector
 	RPT	2,ASLB,ROLA	;scale l component for maximum velocity
 	SUBD	OLVEL,Y		;compute difference from players l velocity
@@ -184,7 +188,10 @@ SCAN3S	LDB	ZONECOL		;get zone color
 	ADCA	#0              
 	ADDD	OLVEL,Y		;add to player l velocity
 	STD	OLVEL,Y		;save new player l velocity
-	LDB	PLSUNIT		;get s component of unit vector
+;	LDB	PLSUNIT		;get s component of unit vector
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	PULS	B
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	SEX                     
 	RPT	3,ASLB,ROLA	;scale s component for maximum velocity
 	SUBD	OSVEL,Y		;compute difference from players s velocity
@@ -235,7 +242,11 @@ SCROLL	LDA	PANMASK		;scrolling and stars on?
 .5S	EQU	*
 	ENDSECTION SCROLL
 ;	LOCAL
-	LDD	PLSUNIT		;soft scrolling: get player ship unit vector
+;	LDD	PLSUNIT		;soft scrolling: get player ship unit vector
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	LDA	PLYRANG
+	JSR	$47C2
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	RPT	3,ASRA		;scale down to add to players position
 	RPT	3,ASRB
 	STD	TEMP		;save players angle vector

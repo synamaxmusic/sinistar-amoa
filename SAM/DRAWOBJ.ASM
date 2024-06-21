@@ -142,15 +142,20 @@ DRAWOBJ	LDX	OIDESC,Y	;ABCDEFGHIJK
 	STB	OSTATUS,Y
 .4S	LDA	OSPOS,Y		;  C  F    K
 	COMA
-	BLE	.6S
+;	BLE	.6S
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	BGT	.AMOA5
+	JMP	OBJOFF
+.AMOA5										;; Local label added for AMOA
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	STA	ODWIDTH,Y	;  C  F
 	EORA	#4		;* * * FOR DMA BUG
 	STA	DWIDE
 	BRA	.11S
 .5S	LDB	OSTATUS,Y	;   D    I K
 	BMI	.7S
-.6S	LDA	#-1		;        I K
-	STA	OSPOS,Y
+;.6S	LDA	#-1		;        I K
+;	STA	OSPOS,Y
 	JMP	OBJOFF
 .7S	STA	OLEFT,Y		;   D
 	STA	DDEST+1
@@ -349,14 +354,17 @@ SCROFF	LDX	OCHAR,Y		;get char desc table addr > uses A,B,X
 	ADDD	#$20
 	RPT	1,ASLB,ROLA
 	STA	OSSVEL,X	;save scanner s velocity
-	PSHS	Y		;save screen workspace
-	TFR	X,Y		;get scanner workspace into Y
-	JSR	ERASCAN		;erase scanner image  save Y, uses A,B
-	JSR	UPSCAN		;update scanner position  save Y, uses A,B,X,U
-	JSR	DRWSCAN		;draw scanner image  save Y, uses A,B,X
+;	PSHS	Y		;save screen workspace
+;	TFR	X,Y		;get scanner workspace into Y
+;	JSR	ERASCAN		;erase scanner image  save Y, uses A,B
+;	JSR	UPSCAN		;update scanner position  save Y, uses A,B,X,U
+;	JSR	DRWSCAN		;draw scanner image  save Y, uses A,B,X
 	CLRD			;zero screen object workspace address
-	STD	OSSCWSA,Y       
-	PULS	Y		;restore screen workspace
+;	STD	OSSCWSA,Y       
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	STD	OSSCWSA,X    
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;	PULS	Y		;restore screen workspace
 ;* kill object
 	ROUTINE	KOBJECT
 	LDX	OFLINK,Y	;> uses A,B,X,Y

@@ -13,6 +13,14 @@ D_P	SET	$98		;Fixme was: D_P SET *!>8
 
 TEMP	RMB	18		;temps						;$9800
 IRQTEMP	RMB	4		;irq routine temporaries			;$9018
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+TEMPLEN	SET	*		;; save our current position
+
+	ORG	TEMP+1
+PLACCEL	RMB	1		;player acceleration
+
+	ORG	TEMPLEN		;; go back to original code
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;*
 SAVEOBJ	RMB	2		;saves current object during task execution	;$981C
 PCRAM	RMB	10		;pseudo color ram
@@ -23,6 +31,9 @@ ESTATE	RMB	1		;exec state: -1 for list drawn
 ;*					     >1 for overload
 SCRKEY	RMB	OLEFT-OFLINK+1	;screen list keystone dummy
 RIGHT	RMB	1		;current display object right
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+PLYRANG	RMB	1		;player rotation angle
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 WSIKEY	RMB	2		;free workspace index keystone
 FOBJKEY	RMB	2		;free object list keystone
 TCLOCK	RMB	1		;task clock
@@ -33,11 +44,11 @@ SSVEL	RMB	2		;screen s velocity
 SLPOS	RMB	3		;screen l position
 SSPOS	RMB	3		;screen s position
 STLPOS	RMB	1	;\	star l position
-STSPOS	RMB	1	;/	star s position					;$984F
-PLYRANG	RMB	1		;player rotation angle				;$9850
-PLSUNIT	RMB	1	;\	player ship direction unit vector s component
-PLLUNIT	RMB	1	;/	player ship direction unit vector l component
-PLACCEL	RMB	1		;player acceleration
+STSPOS	RMB	1	;/	star s position
+;PLYRANG	RMB	1		;player rotation angle
+;PLSUNIT	RMB	1	;\	player ship direction unit vector s component
+;PLLUNIT	RMB	1	;/	player ship direction unit vector l component
+;PLACCEL	RMB	1		;player acceleration
 TNTIME	RMB	1		;tune timer
 TNPC	RMB	2		;tune program counter
 TNPRIO	RMB	1		;tune priority

@@ -138,10 +138,17 @@ ALLOC	PSHS	U		;save regs  > uses A,B,X
 	ROUTINE	DIE
 	LDD	OTLINK,Y	;link-out current process
 	LDX	[PRTASK]
-	BRA	.2S
-.1S	LDX	[X]
+;	BRA	.2S
+;.1S	LDX	[X]
 .2S	CMPY	[OTLINK,X]
-	BNE	.1S
+;	BNE	.1S
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	BEQ	.AMOA3
+	LDX	[OTLINK,X]
+	BNE	.2S
+	SWI
+.AMOA3
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	STD	X
 	LEAX	Y		;get workspace address in X
 ;* de-allocate dynamic storage  pass workspace address in X
