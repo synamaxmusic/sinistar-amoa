@@ -1084,13 +1084,16 @@ IRSBomb	pshs	U
 IRSini	New_Scan	CSini		;* Get scanner WS
 ;*
 ;*				This section from RICH
-	RANDOM	OSEED1,BYTE
-	anda	#~(PSiniInhibit)						;;Fixme was: anda  #!N(PSiniInhibit)
-	ora	#MaxSinOrbit
-	sta	OSPERS,X
+;	RANDOM	OSEED1,BYTE
+;	anda	#~(PSiniInhibit)						;;Fixme was: anda  #!N(PSiniInhibit)
+;	ora	#MaxSinOrbit
+;	sta	OSPERS,X
 ;*
 ;*
-	jsr	Vibzer			;* Zero out its vibration block
+;	jsr	Vibzer			;* Zero out its vibration block
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	JSR	AMOAIRSini
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	jsr	InCaller		;* Give it Caller primary intelligence
 	ldd	OIndex,X		;* Get index to Sinistar
 	std	SinIndex		;* Save it for others to use
@@ -1816,7 +1819,10 @@ Prios	fcb	$58,$58		;* Temporary base priorities for planets
 	fcb	$48,$5B		;* Player
 	fcb	$00,$54		;* Sinistar
 	fcb	$70,$70		;* Sinibomb
-	fcb	$68,$58+3	;* Crystals
+;	fcb	$68,$58+3	;* Crystals
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	fcb	$68,$58+1	;* Crystals
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;*
 ;*
@@ -1969,7 +1975,10 @@ ID0End	rmb	0		;* Marks end of diff. table
 ;*		InPop1 - Void Zone
 
 InPop1	fcb	6		;* Workers
-	fcb	8		;* Warriors
+;	fcb	8		;* Warriors
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	fcb	6		;* Warriors
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	fcb	1		;* Type 1 planets
 	fcb	1		;* Type 2 planets
 	fcb	1		;* Type 3 planets
@@ -2006,7 +2015,10 @@ ID1End	rmb	0		;* Marks end of diff. table
 ;*		InPop2 - Worker Zone
 
 InPop2	fcb	$10		;* Workers				;;Fixme was: fcb  10
-	fcb	3		;* Warriors
+;	fcb	3		;* Warriors
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	fcb	6		;* Warriors		;; Holy crap, that's a lot of warriors...
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	fcb	10		;* Type 1 planets			;;Fixme was: fcb  10.
 	fcb	2		;* Type 2 planets
 	fcb	2		;* Type 3 planets
@@ -2026,7 +2038,10 @@ InPop2	fcb	$10		;* Workers				;;Fixme was: fcb  10
 	fdb	DTime
 	fcb	10							;;Fixme was: fcb  10.
 	fdb	_PWor		;* Workers				;;Fixme was: fdb  .PWor
-	fcb	$10							;;Fixme was: fcb  10
+;	fcb	$10							;;Fixme was: fcb  10
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	fcb	10				;; Was this a typo?
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	fdb	_PWar		;* Warriors				;;Fixme was: fdb  .PWar
 	fcb	-8
 	fdb	_PPl1		;* Plan1's				;;Fixme was: fdb  .PPl1

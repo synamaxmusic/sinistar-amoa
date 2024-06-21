@@ -47,11 +47,11 @@ SC7	_IPRIO	3A
 	_TIME	80
 	_STOP
 ;*
-SC8	_IPRIO	3A
-	_SOUND	$02		;* EEERRAAURGH!
-	_PRIO	3B
-	_TIME	$A0
-	_STOP
+SC8	;_IPRIO	3A								;; This is not in the AMOA build.
+;	_SOUND	$02		;* EEERRAAURGH!
+;	_PRIO	3B
+;	_TIME	$A0
+;	_STOP
 ;*
 SC9	_IPRIO	3C
 	_SOUND	$02		;* EEERRAAURGH!

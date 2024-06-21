@@ -19,10 +19,19 @@ CrProb	equ	$10		;* Chance (/255) of tossing a crystal
 MaxCrA	equ	10		;* Number of seconds in maxium crystal age
 CatPrb	equ	60		;* Probability (/100 hex/sec)of catching crystal
 ;*				  offscreen if worker is close enough
-CryDis	equ	$0C		;* Distance in scanner scale of minimum
+;CryDis	equ	$0C		;* Distance in scanner scale of minimum
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+CryDis	equ	$06		;* Distance in scanner scale of minimum
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;*				  for worker to catch crystal
-MinPrb	equ	$B0		;* Probability (/255 per sec) of trying to mine
-MinDis	equ	$20		;* Distance workers and warriors must be from
+;MinPrb	equ	$B0		;* Probability (/255 per sec) of trying to mine
+;MinDis	equ	$20		;* Distance workers and warriors must be from
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+MinPrb	equ	$70		;* Probability (/255 per sec) of trying to mine
+MinDis	equ	$14		;* Distance workers and warriors must be from
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;*				  Planet to mine it offscreen - scanner coords
 SwrPrb	equ	$10	;* Probability of swarm in /255 per 4 sec ($10 = 1/min)
 ;*
