@@ -54,10 +54,16 @@ MARQUEE	PSHS	Y		;Now resave Y through the next trial
 	STA	PCRAM+$E
 
 	LDY	#MARKEY		;Marquee table
-	LDX	#$7225		;COLUMN OFFSETS $26 THRU $D0			;;Originally #$6825 in AMOA prototype build
+;	LDX	#$7225		;COLUMN OFFSETS $26 THRU $D0			;;Originally #$6825 in AMOA prototype build
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	LDX	#$6825		;COLUMN OFFSETS $26 THRU $D0
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 OWELL	TFR	X,D
-	LDA	#$72								;;Originally #$68 in AMOA prototype build
+;	LDA	#$72								;;Originally #$68 in AMOA prototype build
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	LDA	#$68
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	INCB
 	CMPB	#$D0
 	LBHI	FINSIT
@@ -88,13 +94,37 @@ OWELL	TFR	X,D
 	BRA	.4S	;OF COURSE YOU GOTDA CHECK THIS ONE TOO.
 
 
-FINSIT	TEXT	$52,$CD								;;Originally TEXT  $48,$CD in AMOA build
-	PHRASE	RED,35,TM							;;(PHRASE POINTERS GET MISALIGNED HERE IF MARQUEE IS BUILT)
-	TEXT	$4A,LEFEDG							;;Originally TEXT  $40,LEFEDG in AMOA build
+FINSIT	;TEXT	$52,$CD								;;Originally TEXT  $48,$CD in AMOA build
+	;PHRASE	RED,35,TM							;;(PHRASE POINTERS GET MISALIGNED HERE IF MARQUEE IS BUILT)
+	;TEXT	$4A,LEFEDG							;;Originally TEXT  $40,LEFEDG in AMOA build
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	TEXT	$48,$CD	
+	PHRASE	RED,35,TM
+	TEXT	$40,LEFEDG
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	PHRASE	RED,35,COPYRIGHT,1982,WILLIAMS,ELECTRONICS,INC
 	
 	PULS	Y,PC
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; (Needed for AMOA)
+ROMSAVE	SET	*		;; Save the current address
+
+	ORG	PHRSAV		;; Jump over to PHRSAV to save our pointers
+	
+	FDB	_TM
+	
+	FDB	_COPYRIGHT
+	FDB	_1982
+	FDB	_WILLIAMS
+	FDB	_ELECTRONICS
+	FDB	_INC
+	
+	
+PHRSAV	SET	*		;; Mark the new address for PHRSAV to add
+				;; more phrases later
+
+	ORG	ROMSAVE		;; Back to our regularly scheduled programming...
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;******************************************************************************
 ;* THE MARKEY TABLE

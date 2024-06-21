@@ -9,9 +9,14 @@
 ;* SINISTAR EXPLOSION TASK
 ;*
 ;* ENTRY: Y points to the task workspace
-SNXTSK	TST	INIMPULSE	;If we're still in impulse drive phase -1
-	BNE	.1S		;  then go mutate the face
-				
+SNXTSK	;TST	INIMPULSE	;If we're still in impulse drive phase -1
+	;BNE	.1S		;  then go mutate the face
+			
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	DEC	OMTLEN+1,Y	;COUNTDOWN
+	BNE	.1S
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+			
 	LDD	#PIECEND	;  else SS is onscreen and dead dead dead
 	STD	FINISH		;  so make marks as such
 	STD	PIECEPTR
@@ -50,7 +55,16 @@ SNXBRX	DEC	OMTLEN,Y		;Another to do?
 .2S	LDD	#PIECETBL		;Reset the Sinistar piece pointers
 	STD	PIECEPTR
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	LDX	[SININDEX]	;Get Sinistar scanner WS
+	ldu	OSChar,X	;* Point to characteristic descriptor
+	jsr	[OKiVec,U]		;* Do appropriate kill subroutine
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 	JSR	PCLRSCR		;Clear the lower screen
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	DEC	DEATHFLAG
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;	
 	JSR	INISINI		;* To clean out the SiniStar image
 	JMP	DIE		;When we hit zero we're through
 

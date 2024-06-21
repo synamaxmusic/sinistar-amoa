@@ -152,7 +152,7 @@ ROMSAVE	SET	*		;; Save the current address
 	ORG	PHRSAV		;; Jump over to PHRSAV to save our pointers
 
 	FDB	_BLAST	
-	FDB	_CRYSTALS
+;	FDB	_CRYSTALS	;; AMOA edit
 	FDB	_OFF  	
 ;	FDB	_PLANETOIDS
 	
@@ -163,7 +163,7 @@ ROMSAVE	SET	*		;; Save the current address
 	FDB	_FILL      
 	FDB	_BOMBBAY   
 	FDB	_WITH      
-	FDB	_SINIBOMBS 
+;	FDB	_SINIBOMBS 
 	
 	FDB	_FIRING    
 	FDB	_DOES      

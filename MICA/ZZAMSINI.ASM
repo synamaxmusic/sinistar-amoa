@@ -37,64 +37,125 @@
 ;* Phase 1:
 	LDD	OMTLEN,Y	;Countdown
 	SUBD	#1              
-	BEQ	.AM100S		;When we've counted down start Phase 2
-	STD	OMTLEN,Y	;  else save countdown
-				
-	LDA	BOMBS		;Have we collected enough Sinibombs yet?
-	CMPA	#4              						;;Patched over in BOBFIXES.ASM ($8C99) "8 Sinibombs to initiate Phase 2"
-	BGE	.AM100S		;If so then start Phase 2
+;	BEQ	.AM100S		;When we've counted down start Phase 2
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	LBEQ	DIE
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-	SLEEP	LOOP
+	STD	OMTLEN,Y	;  else save countdown
+	
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	CMPD	#$1E0
+	BHI	.110S
+	CMPD	#MAXMES
+	BEQ	.106S
+	CMPD	#$78
+	BEQ	.BMBBTN
+	CMPD	#$5A
+	BEQ	.BMBBTN
+	CMPD	#$3C
+	BNE	.AM100S
+	
+	
+.BMBBTN	PSHS	Y
+	JSR	AMOABOMB
+	PULS	Y
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;	LDA	BOMBS		;Have we collected enough Sinibombs yet?
+;	CMPA	#4              						;;Patched over in BOBFIXES.ASM ($8C99) "8 Sinibombs to initiate Phase 2"
+;	BGE	.AM100S		;If so then start Phase 2
+;
+;	SLEEP	LOOP
 
 
 ;* Phase 2 Setup:
 ;* Here, we force the player's mission to Bomb the Sinistar!
 .AM100S	LDX	[PLAINDEX]	;Player's workspace				;;Fixme was: 100$  LDX	[PLAINDEX]
-	LDA	#OMWABOMB	;Bomb mission
+;	LDA	#OMWABOMB	;Bomb mission
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	LDA	#OMWAINT	;Bomb mission
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 	STA	OSMIS,X         
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+.AM1000S
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	LDD	SININDEX	;Pointer to Sinistar's workspace
 	STD	OSCWCR,X	;This is the player's tail target
 	LDA	#$FF		;Force feed
 	STA	OCALPRI,X	;  the priority of this task
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	TST	OSLVEL,Y	;;????????
+	BNE	.110S
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 ;* If the Sinistar isn't in sector, push it there
 	TST	SINISECTOR	;Is Sini onsector?
-	BEQ	.105S		;Branch if so
-	CLRD			; else force to the edge
-	STD	SSLPOS
-	STD	SSSPOS
+;	BEQ	.105S		;Branch if so
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	BNE	.109S		;Branch if so
+	INC	OSSVEL,Y	
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;	CLRD			; else force to the edge
+;	STD	SSLPOS
+;	STD	SSSPOS
 
 	RADIX	10								;;(decimal values ahead)
 
 ;* Set up to launch 16 workers
-.105S	LDA	#16								;;Fixme was: LDA  #16. (This gets patched over in BOBFIXES.ASM but it's already the correct value!) ($8CBF)
-	STA	OMTLEN,Y
-
-;* Change the sleep to TASK8
-	CHANGE_SLEEP	TASK8,HERE
-
-;* Phase 2:
-;* If the player has no Sinibombs, enter Phase 3
-	TST	BOMBS								;;Patched over in BOBFIXES ($8CC8) "causes ZZAMSINI to constantly force-feed the bomb mission on the player"
-	BEQ	.AM200S
-
-;* Get the launch counter and launch a worker if another is wanted
-	LDA	OMTLEN,Y	;Is there another to do?
-	BEQ	.110S		;Branch to sleep if not
-				
-	DEC	OMTLEN,Y	;Else bump the counter down
-	ANDA	#3		;Make A into an index to the start-pos table
-	LDU	#AMSWTB		;Get address of offset table
-	LDD	B,U		;Get next packed offset				;;Patched over in BOBFIXES ($8CD8) "FIX ZZAMSINI  --  Change LDD B,U to LDD A,U"
+;.105S	LDA	#16								;;Fixme was: LDA  #16. (This gets patched over in BOBFIXES.ASM but it's already the correct value!) ($8CBF)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+.105S	LDA	#6
+	CMPA	OSSVEL,Y
+	BNE	.110S
+	COM	OSLVEL,Y
+.106S	LDA	#2
+	PSHS	A
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;	STA	OMTLEN,Y
+;
+;;* Change the sleep to TASK8
+;	CHANGE_SLEEP	TASK8,HERE
+;
+;;* Phase 2:
+;;* If the player has no Sinibombs, enter Phase 3
+;	TST	BOMBS								;;Patched over in BOBFIXES ($8CC8) "causes ZZAMSINI to constantly force-feed the bomb mission on the player"
+;;	BEQ	.AM200S
+;
+;;* Get the launch counter and launch a worker if another is wanted
+;	LDA	OMTLEN,Y	;Is there another to do?
+;	BEQ	.110S		;Branch to sleep if not
+;				
+;	DEC	OMTLEN,Y	;Else bump the counter down
+;	ANDA	#3		;Make A into an index to the start-pos table
+.107S	LDU	#AMSWTB		;Get address of offset table
+;	LDD	B,U		;Get next packed offset				;;Patched over in BOBFIXES ($8CD8) "FIX ZZAMSINI  --  Change LDD B,U to LDD A,U"
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+.108S	LDD	,U+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	JSR	IRWOCR		;Create a crystallized worker there
-				
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	CMPU	#AMSWTB+4	;; Compare end of AMSWTB table
+	BNE    .108S
+	DEC    ,S
+	BNE    .107S
+	LEAS   $1,S
+	BRA    .110S
+.109S	CLR    OSSVEL,Y
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	
 .110S	SLEEP	LOOP		;  and go back to sleep
 
 
 ;* Phase 3:
-.AM200S	LDD	#(3*60)/8	;Sleep for approximately 3 seconds		;;Fixmw was: 200$  LDD  #(3.*60.)/8  (Patched over in BOBFIXES ($8CE3), looks like time increased to 4 seconds)
-	JSR	TIMER
-	JMP	DEATH		;  then go kill the attract demo
+;.AM200S	LDD	#(3*60)/8	;Sleep for approximately 3 seconds		;;Fixmw was: 200$  LDD  #(3.*60.)/8  (Patched over in BOBFIXES ($8CE3), looks like time increased to 4 seconds)
+;	JSR	TIMER
+;	JMP	DEATH		;  then go kill the attract demo
 
 
 AMSWTB	FCB	$5F,$5F,$9F,$9F,$5F	;Table of screen location pairs

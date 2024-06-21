@@ -118,115 +118,115 @@ PXPAL1	FCB	$00,00
 ;*
 ;* Entry: Y points to task workspace
 
-PLEXTRA	LDX	#WPLAYER	;Get pointer to player workspace
-	LDX	OBOTTOM,X	;  and get screen address of player
-	LEAX	$102,X
-	LDA	#PLEXWCT	;Get wave count (for looping)
-	PSHS	A,X		;Save these on the stack
-
-	LEAX	OPEXWSP,Y	;Get pointer to workspace of first piece
-
-
-.5S	LDA	#2		;Loop on A
-.10S	DECA			;  for values 1,0,-1
-
-	LDB	#6		;Loop on B
-.20S	SUBB	#3		;  for values 3,0,-3
-				
-	PSHS	D		;Save this offset
-	ADDD	3,S		;Add it to the screen position
-	STD	OPEXPOS,X	;Save as this piece's starting position
-				
-	RANDOM	OSEED1,8	;Get random LONG velocity from 0 to 3		;;Fixme was: RANDOM	OSEED1,8.
-	ASRA
-	BCC	.25S
-	NEGA
-.25S	STA	OPEXVEL,X
-	
-	RADIX	10
-	RANDOM	OSEED2,12	;Get random SHORT velocity from 0 to 5		;;Fixme was: RANDOM	OSEED2,12.
-	RADIX	16
-	ASRA
-	BCC	.26S
-	NEGA
-.26S	STA	OPEXVEL+1,X
-
-	LEAX	4,X		;Advance X to next workspace
-
-	PULS	D		;Restore offset
-	TSTB			;Has B bottomed out yet?
-	BPL	.20S
-	TSTA			;Has A bottomed out yet?
-	BPL	.10S
-
-	DEC	,S		;Loop on waves
-	BNE	.5S
-	LEAS	3,S
-
-	LDA	#PLEXTMR	;Get count for drawing the pieces
-	STA	OPEXCTR,Y
-
-	SLEEP	HERE
-
-;* The remainder of this task draws the pieces
-;	LOCAL
-
-	DEC	OPEXCTR,Y	;Countdown
-	BPL	.11S		;  and stay alive until less than zero		;;Fixme was: BPL  10$
-	JSR	PCLRSCR		;  else clear the screen
-	JMP	DIE		;  and Die
-				
-.11S	LDD	#$0505		;Get image size (1 by 1) EOR-ed for DMA fix	;;Fixme was: 10$  LDD	#$0505
-	STD	$CA06		;  and write it to DMA control
-				
-	LDD	#PLEXIMG	;Get pointer to image
-	STD	$CA02		;  and write it to DMA control
-				
-	LDA	OPEXCTR,Y	;Fetch the timer value for use as offset into
-	ASRA			;  Special Effects color table.  Divide by 2 to
-	LDU	#PLEXEE		;  use each entry twice.  Get the color from
-	LDA	A,U		;  the table and save it to the PCRAM location
-	STA	PCRAM+$7
-
-	LDX	#PLEXWSZ*PLEXWCT	;Get total pieces to move
-
-	LEAU	OPEXWSP,Y	;Get pointer to first piece's workspace
-
-.30S	LDD	OPEXPOS,U	;Get position of this piece
-	ADDD	OPEXVEL,U	;Add the velocity
-	TSTA
-	BMI	.40S		;  and skip when offscreen in LONG direction
-	CMPB	#$F0		;  and skip when we're about to wrap around
-	BHI	.40S
-	STD	OPEXPOS,U	;Save as new position
-	STD	$CA04		;Write it to DMA control
-				
-	LDA	#$0E		;Get write byte
-	STA	$CA00		;  and draw this dot!
-				
-.40S	LEAU	4,U		;Advance to next piece workspace
-	LEAX	-1,X            
-	BNE	.30S		;  and loop until done
-
-	SLEEP	LOOP		;Sleep
-
-;* This is the one-byte image of the dot, specifying color 7
-PLEXIMG	FCB	$70
-
-;* Table of colors for special effect color 7
-;*		 bbgggrrr	Color bits
-PLEXEE	FCB	%00000000
-	FCB	%01001000
-	FCB	%10010001
-	FCB	%11001010
-	FCB	%10000100
-	FCB	%01000110
-	FCB	%00000111
-	FCB	%00010111
-	FCB	%01100111
-	FCB	%10101111
-	FCB	%11111111
-	FCB	%11111111
+;PLEXTRA	LDX	#WPLAYER	;Get pointer to player workspace
+;	LDX	OBOTTOM,X	;  and get screen address of player
+;	LEAX	$102,X
+;	LDA	#PLEXWCT	;Get wave count (for looping)
+;	PSHS	A,X		;Save these on the stack
+;
+;	LEAX	OPEXWSP,Y	;Get pointer to workspace of first piece
+;
+;
+;.5S	LDA	#2		;Loop on A
+;.10S	DECA			;  for values 1,0,-1
+;
+;	LDB	#6		;Loop on B
+;.20S	SUBB	#3		;  for values 3,0,-3
+;				
+;	PSHS	D		;Save this offset
+;	ADDD	3,S		;Add it to the screen position
+;	STD	OPEXPOS,X	;Save as this piece's starting position
+;				
+;	RANDOM	OSEED1,8	;Get random LONG velocity from 0 to 3		;;Fixme was: RANDOM	OSEED1,8.
+;	ASRA
+;	BCC	.25S
+;	NEGA
+;.25S	STA	OPEXVEL,X
+;	
+;	RADIX	10
+;	RANDOM	OSEED2,12	;Get random SHORT velocity from 0 to 5		;;Fixme was: RANDOM	OSEED2,12.
+;	RADIX	16
+;	ASRA
+;	BCC	.26S
+;	NEGA
+;.26S	STA	OPEXVEL+1,X
+;
+;	LEAX	4,X		;Advance X to next workspace
+;
+;	PULS	D		;Restore offset
+;	TSTB			;Has B bottomed out yet?
+;	BPL	.20S
+;	TSTA			;Has A bottomed out yet?
+;	BPL	.10S
+;
+;	DEC	,S		;Loop on waves
+;	BNE	.5S
+;	LEAS	3,S
+;
+;	LDA	#PLEXTMR	;Get count for drawing the pieces
+;	STA	OPEXCTR,Y
+;
+;	SLEEP	HERE
+;
+;;* The remainder of this task draws the pieces
+;;	LOCAL
+;
+;	DEC	OPEXCTR,Y	;Countdown
+;	BPL	.11S		;  and stay alive until less than zero		;;Fixme was: BPL  10$
+;	JSR	PCLRSCR		;  else clear the screen
+;	JMP	DIE		;  and Die
+;				
+;.11S	LDD	#$0505		;Get image size (1 by 1) EOR-ed for DMA fix	;;Fixme was: 10$  LDD	#$0505
+;	STD	$CA06		;  and write it to DMA control
+;				
+;	LDD	#PLEXIMG	;Get pointer to image
+;	STD	$CA02		;  and write it to DMA control
+;				
+;	LDA	OPEXCTR,Y	;Fetch the timer value for use as offset into
+;	ASRA			;  Special Effects color table.  Divide by 2 to
+;	LDU	#PLEXEE		;  use each entry twice.  Get the color from
+;	LDA	A,U		;  the table and save it to the PCRAM location
+;	STA	PCRAM+$7
+;
+;	LDX	#PLEXWSZ*PLEXWCT	;Get total pieces to move
+;
+;	LEAU	OPEXWSP,Y	;Get pointer to first piece's workspace
+;
+;.30S	LDD	OPEXPOS,U	;Get position of this piece
+;	ADDD	OPEXVEL,U	;Add the velocity
+;	TSTA
+;	BMI	.40S		;  and skip when offscreen in LONG direction
+;	CMPB	#$F0		;  and skip when we're about to wrap around
+;	BHI	.40S
+;	STD	OPEXPOS,U	;Save as new position
+;	STD	$CA04		;Write it to DMA control
+;				
+;	LDA	#$0E		;Get write byte
+;	STA	$CA00		;  and draw this dot!
+;				
+;.40S	LEAU	4,U		;Advance to next piece workspace
+;	LEAX	-1,X            
+;	BNE	.30S		;  and loop until done
+;
+;	SLEEP	LOOP		;Sleep
+;
+;;* This is the one-byte image of the dot, specifying color 7
+;PLEXIMG	FCB	$70
+;
+;;* Table of colors for special effect color 7
+;;*		 bbgggrrr	Color bits
+;PLEXEE	FCB	%00000000
+;	FCB	%01001000
+;	FCB	%10010001
+;	FCB	%11001010
+;	FCB	%10000100
+;	FCB	%01000110
+;	FCB	%00000111
+;	FCB	%00010111
+;	FCB	%01100111
+;	FCB	%10101111
+;	FCB	%11111111
+;	FCB	%11111111
 
 
 

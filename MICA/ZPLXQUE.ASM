@@ -64,13 +64,13 @@ PLXPLP	RANDOM	OSEED2,15,-7	;Random SHORT velocity of -7 to 7		;;Fixme was: RANDO
 
 	LEAS	3,S		;Else reset stack
 
-	LDD	FREE		;Test if there's enough memory left
-	CMPD	#2*(OPEXTSZ+ODYNOVH)	;for this task
-	BLT	PLXXIT		;  and skip it if not
-
-	NEW_SLEEP	TASK2,PLEXTRA,OPEXTSZ	;else queue up the task
-
-
+;	LDD	FREE		;Test if there's enough memory left
+;	CMPD	#2*(OPEXTSZ+ODYNOVH)	;for this task
+;	BLT	PLXXIT		;  and skip it if not
+;
+;	NEW_SLEEP	TASK2,PLEXTRA,OPEXTSZ	;else queue up the task
+;
+;
 PLXXIT	PULS	D,X,Y,U,PC	   ;and split
 
 

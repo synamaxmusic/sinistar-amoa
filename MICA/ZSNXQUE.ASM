@@ -4,6 +4,7 @@
 
 	PUSHORG	ROMSAVE
 
+	ROUTINE	SNXQUE				;; Sam references this label in AMOA 
 
 	ROUTINE	KABOOM
 ;*****************************************************************************
@@ -29,14 +30,20 @@
 	jsr	IniSini		;* To clean out the SiniStar image
 
 
-	NEW_SLEEP TASK4,SNXTSK,OMTLEN+1  ;Awaken the Sinistar explosion task
+;	NEW_SLEEP TASK4,SNXTSK,OMTLEN+1  ;Awaken the Sinistar explosion task
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	NEW_SLEEP TASK4,SNXTSK,OMTLEN+2  ;Awaken the Sinistar explosion task
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 	RANDOM	OSEED1,8,0	;Get a random value from 0 to 7
 	LDY	#SININT		;Y <- address of the explosion increments table
 	LDB	A,Y		;Get this increment
 	STB	OMTLEN,X	;  and save into the task workspace
 
-
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	LDB	#$0F		;Get one selection of background color
+	STB	5,X
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 	NEW_SLEEP	TASK4,SNXBFT,OMTLEN+1	;Make Flasher Task
 	LDA	#(60*3)/4			;Let live for 2 seconds		;;Fixme was: LDA  #(60.*3)/4
@@ -47,11 +54,11 @@
 	LDA	#14				;Have it make n booms		;;Fixme was: LDA  #14.
 	STA	OMTLEN,X
 
-	TST	PLAGRAVE	;Test if player is dead already
-	BEQ	.4S		;  and branch if not
-	INC	PLUWPF		;  else set warp flag
-
-.4S	JSR	KRSINI		;Do KRSINI here
+;	TST	PLAGRAVE	;Test if player is dead already
+;	BEQ	.4S		;  and branch if not
+;	INC	PLUWPF		;  else set warp flag
+;
+;.4S	JSR	KRSINI		;Do KRSINI here
 
 	PULS	D,X,Y,U,PC	;That's all for now, folks
 
@@ -59,8 +66,8 @@
 
 ;******************************************************************************
 ;* This is the Sinistar Explosion Background Flash Task
-SNXBFT	TST	INIMPULSE	;If we're still InImpulse
-	BNE	.1S		;  then go flash one more time
+SNXBFT	;TST	INIMPULSE	;If we're still InImpulse
+;	BNE	.1S		;  then go flash one more time
 	LDA	OMTLEN,Y	;Decrement Alive Counter
 	DECA                    
 	LBEQ	DIE		;  and DIE when done
@@ -72,10 +79,15 @@ SNXBFT	TST	INIMPULSE	;If we're still InImpulse
 .2S	STB	PCRAM		;Flash the background
 	SLEEP	LOOP		;Wait for another opportunity to serve
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+SNXWBM	DEC	OMTLEN,Y	;COUNTDOWN
+	LBEQ	DIE
+	LDX	[SININDEX]	;Get Sinistar scanner WS
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;******************************************************************************
 ;* This is the Warrior Booms task
-SNXWBM	LDX	[SININDEX]	;Get Sinistar scanner WS			;;Fixme was: LDX  [SININD]
+;SNXWBM	LDX	[SININDEX]	;Get Sinistar scanner WS			;;Fixme was: LDX  [SININD]
 	LDX	OSSCWSA,X	;Get screen workspace address
 	BEQ	.3S		;If zero then not onscreen, so do wait
 				
@@ -87,8 +99,8 @@ SNXWBM	LDX	[SININDEX]	;Get Sinistar scanner WS			;;Fixme was: LDX  [SININD]
 	PULS	D		;Restore the original location
 	STD	OBOTTOM,X       
 				
-	DEC	OMTLEN,Y	;COUNTDOWN
-	LBEQ	DIE
+;	DEC	OMTLEN,Y	;COUNTDOWN
+;	LBEQ	DIE
 
 .3S	SLEEP	LOOP
 

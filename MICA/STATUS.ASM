@@ -19,7 +19,10 @@
 	TST	AMDEMO		;Test the mysterious AMDEMO flag
 	BNE	.200S		;  and exit immediately if non-zero
 
-	BSR	.201S		;  with the Status Page call
+;	BSR	.201S		;  with the Status Page call
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	JSR	.201S
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;* 201$ returns with D set to the appropriate TIMER value
 	PULS	Y
 
@@ -137,6 +140,9 @@ ROMSAVE	SET	*		;; Save the current address
 	FDB	_HAS
 	FDB	_PIECES
 	FDB	_SMASHED
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	FDB	_S		;; AMOA needs this
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 PHRSAV	SET	*		;; Mark the new address for PHRSAV to add
 				;; more phrases later

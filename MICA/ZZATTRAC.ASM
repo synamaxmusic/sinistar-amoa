@@ -7,9 +7,9 @@
 
 	RADIX	10								;;(decimal values ahead)
 
-	VECTOR	POWVECT
-	CLR	HSTDMRQ		;Clear HSTD Page display flag on powerup
-	RTS
+	;VECTOR	POWVECT
+	;CLR	HSTDMRQ		;Clear HSTD Page display flag on powerup
+	;RTS
 
 ;******************************************************************************
 ;*
@@ -27,9 +27,12 @@
 	JSR	RCMOSA		;  HSTD table
 	LBEQ	ATT10S		;  and branch out if not allowed		;;Fixme was: LBEQ  10$ (Had to make global label)
 				
-	INC	HSTDMRQ		;Set the HSTD/Marquee flag
-				
-	LDA	#%00110011	;Allow Player 1/2 start, FIRE, SINIBOMB
+;	INC	HSTDMRQ		;Set the HSTD/Marquee flag
+;				
+;	LDA	#%00110011	;Allow Player 1/2 start, FIRE, SINIBOMB
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	LDA	#%00110010
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	STA	PANMASK         
 				
 	JSR	CLRSCR		;Clear the entire screen
@@ -141,24 +144,29 @@ ATT10S	PSHS	Y		;Now resave Y through the next trial		;;Fixme was: 10$  PSHS	Y
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	ENDIF
 
-	LDB	#$CC		;Get message "shadow" color
-	LDX	#CMOSOPE	;Cmos location of operator message line 1
-	LDY	#$3425		;Screen address for text
-	JSR	OPMDRW		;Draw it
-	LDB	#$33		;Line 1 "foreground" color
-	LEAY	-1,Y		;Bump screen location one left
-	JSR	OPMDRW		;Draw text again
-				
-	LDB	#$CC		;Same as above, but with message line 2
-	LDX	#CMOSO2
-	LDY	#$2C25
-	JSR	OPMDRW
-	LDB	#$22
-	LEAY	-1,Y
-	JSR	OPMDRW
+;	LDB	#$CC		;Get message "shadow" color
+;	LDX	#CMOSOPE	;Cmos location of operator message line 1
+;	LDY	#$3425		;Screen address for text
+;	JSR	OPMDRW		;Draw it
+;	LDB	#$33		;Line 1 "foreground" color
+;	LEAY	-1,Y		;Bump screen location one left
+;	JSR	OPMDRW		;Draw text again
+;				
+;	LDB	#$CC		;Same as above, but with message line 2
+;	LDX	#CMOSO2
+;	LDY	#$2C25
+;	JSR	OPMDRW
+;	LDB	#$22
+;	LEAY	-1,Y
+;	JSR	OPMDRW
 
 
-	LDD	#$1C0		;Countdown value
+;	LDD	#$1C0		;Countdown value
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	LDD	#$180		;Countdown value
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 	STD	MARQCNT		;Save it for guess what
 				
 	PULS	Y		;Restore Y
@@ -170,9 +178,13 @@ ATT10S	PSHS	Y		;Now resave Y through the next trial		;;Fixme was: 10$  PSHS	Y
 	LDD	MARQCNT		;Wake up here.  When MARQCNT bottoms out,
 	SUBD	#1		;  restart the system.
 	STD	MARQCNT
-	BNE	.124S
-	CLR	HSTDMRQ
-	JMP	IAMODE
+;	BNE	.124S
+;	CLR	HSTDMRQ
+;	JMP	IAMODE
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	LBEQ	PNTSCRN
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 .124S	CMPD	#$100		;For the first bunch of passes, leave the screen
 	LBHS	FINIT		;  as is.					;;This gets patched over in BOBFIXES ($8183)
@@ -187,12 +199,19 @@ ATT10S	PSHS	Y		;Now resave Y through the next trial		;;Fixme was: 10$  PSHS	Y
 	LDA	#P_SINISTAR	;Get the Sinistar word value			;;Fixme was: LDA  #.SINISTAR (had to be rename "." PhrNum labels to "P_")
 	JSR	OUTP68		;Go print it out
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	TEXT	$54,$99
+	PHRASE	RED,35,TM
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-	TEXT	$4A,LEFEDG
+;	TEXT	$4A,LEFEDG
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	TEXT	$40,LEFEDG
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	PHRASE	RED,35,COPYRIGHT,1982,WILLIAMS,ELECTRONICS,INC
 	
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;	IFNDEF	KENSMARQ	;; If MARQUEE.ASM is not included then add these to PHRSAV
+	IFNDEF	KENSMARQ	;; If MARQUEE.ASM is not included then add these to PHRSAV
 ROMSAVE	SET	*		;; Save the current address
 
 	ORG	PHRSAV		;; Jump over to PHRSAV to save our pointers
@@ -207,7 +226,7 @@ PHRSAV	SET	*		;; Mark the new address for PHRSAV to add
 				;; more phrases later
 
 	ORG	ROMSAVE		;; Back to our regularly scheduled programming...
-;	ENDIF
+	ENDIF
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 FINIT	JSR	DCREDITS
@@ -407,22 +426,22 @@ DISINT	PSHS	X,Y,D
 ;*	X has address in CMOS of text start
 ;*	Y has screen address for start of text
 
-OPMDRW	PSHS	D,X,Y
-
-	LDA	#OPENLEN
-	PSHS	A
-
-.10S	JSR	RCMOSA
-	EXG	X,Y
-	LDB	2,S
-	JSR	OUTCHR
-	EXG	X,Y
-	DEC	,S
-	BNE	.10S
-
-	LEAS	1,S
-
-	PULS	D,X,Y,PC
+;OPMDRW	PSHS	D,X,Y
+;
+;	LDA	#OPENLEN
+;	PSHS	A
+;
+;.10S	JSR	RCMOSA
+;	EXG	X,Y
+;	LDB	2,S
+;	JSR	OUTCHR
+;	EXG	X,Y
+;	DEC	,S
+;	BNE	.10S
+;
+;	LEAS	1,S
+;
+;	PULS	D,X,Y,PC
 	
 	RADIX	16								;;(switching back to hex)
 

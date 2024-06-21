@@ -43,7 +43,7 @@ OPENRTN	RMB	2		;Holds return address from OPENT routine
 
 
 	PUSHORG	PLAYSAV									;;Fixme was: PUSHORG	PLAYSAVE
-PLUWPF	RMB	1		;Add the PlayerUpWarpFlag to the player's RAM
+;PLUWPF	RMB	1		;Add the PlayerUpWarpFlag to the player's RAM
 	PULLORG	PLAYSAV									;;Fixme was: PULLORG	PLAYSAVE
 
 

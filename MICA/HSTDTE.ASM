@@ -30,9 +30,9 @@
 	PULS	Y,U		;Restore Score pointers
 	STY	OHSMP1,X	;Save player one pointer
 	STU	OHSMP2,X	;  and Player two
-	LDA	NPLAYER
-	STA	OHSMNP,X
-	CLR	NPLAYER
+;	LDA	NPLAYER
+;	STA	OHSMNP,X
+;	CLR	NPLAYER
 	JMP	STARTS		;Go start up the task system
 
 ;*
@@ -63,7 +63,12 @@ HSTDMS	LDD	#(60*1)								;;Fixme was: LDD  #(60.*1)
 	SLEEP	LOOP
 
 .3S	TFR	Y,U
-	LDA	OHSMNP,U	;Test if this was a one or two player game
+;	LDA	OHSMNP,U	;Test if this was a one or two player game
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	LDA	NPLAYER		;Test if two-player
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 	DECA			;  and
 	BEQ	.1S		;  if one player then skip to page-display
 
@@ -90,8 +95,11 @@ HSTDMS	LDD	#(60*1)								;;Fixme was: LDD  #(60.*1)
 	RADIX	16									;;(back to hex)
 	JSR	TIMER
 
-.2S	JMP	IAMODE		;Restart system
-
+;.2S	JMP	IAMODE		;Restart system
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+.2S	CLR	NPLAYER
+	JMP	IAMODE		;Restart system
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;*
 ;* Test For High Score to Date
@@ -126,11 +134,62 @@ HSTEST	PSHS	B,X,Y,U
 ;*	      X points to low entry of table where score is to be installed
 
 .1S	PSHS	X,Y		;Save our pointers
+;
+;	JSR	PCLRSCR		;Clear the bottom of the screen
+;	JSR	ANPLAY		;  and announce the current player
+;
+;	TEXT	$4F,$4F
+;	PHRASE	BLUE,68,CONGRATULATIONS
+;	TEXT	$50,$4E
+;	PHRASE	YELLOW,68,CONGRATULATIONS
+;	TEXT	$48,$49
+;	PHRASE	WHITE,68,YOUR,SCORE,RANKS
+;	TEXT	$40,$49
+;	PHRASE	WHITE,68,AMONG,THE,TOP,30
+;	TEXT	$38,$53
+;	PHRASE	CREAM,68,GIVE,3,INITIALS
+;	JSR	JFTEXT		;Joystick/Fire Buttons Message subroutine
 
-	JSR	PCLRSCR		;Clear the bottom of the screen
-	JSR	ANPLAY		;  and announce the current player
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;	NEW_SLEEP	TASK2,HSTDSLV,OHSTDMR  ;Make the task to get the entry
+	NEW_SLEEP	TASK2,HSTDSLV,OHSINIT+3  ;Make the task to get the entry
+	PULS	Y,U		;Restore our pointers
+				
+	STY	OHSTPTR,X	;Table pointer
+	STU	OHSPSCR,X	;Player's score
+				
+	CLR	OHSCPS,X	;Cursor positioned initialized
+				
+	LDA	#CBLANK		;Get a blank character
+	LDB	#2		;Get a displacement of 2
+	LEAU	OHSINIT,X	;Get the address for the 3 initials
+.12S	STA	B,U		;Store a blank here
+	DECB			;  and
+	BPL	.12S		;  repeat for B = 2 to 0
 
-	TEXT	$4F,$4F
+	LDA	#MAXBNC
+	STA	OHSBNC,X
+
+	LDD	#MAXETV		;Maximum time to enter initials
+	STD	OHSETM,X	;Save this max time in task workspace
+	COMA
+	PULS	B,X,Y,U,PC	;  and return it to calling routine
+
+
+;* This is the SLAVE task for High Score to Date
+;*   Player-Initials entry routine and score installation task
+;*
+
+HSTDSLV	PSHS	Y
+
+	JSR	PCLRSCR		;Clear the screen
+
+	LDB	NPLAYER		;Test if this game was one or two player
+	DECB			;  and
+	BEQ	.2S		;  if one then skip
+	JSR	ANPLAY		;  else go announce the current player
+
+.2S	TEXT	$4F,$4F
 	PHRASE	BLUE,68,CONGRATULATIONS
 	TEXT	$50,$4E
 	PHRASE	YELLOW,68,CONGRATULATIONS
@@ -140,7 +199,11 @@ HSTEST	PSHS	B,X,Y,U
 	PHRASE	WHITE,68,AMONG,THE,TOP,30
 	TEXT	$38,$53
 	PHRASE	CREAM,68,GIVE,3,INITIALS
-	JSR	JFTEXT		;Joystick/Fire Buttons Message subroutine
+	TEXT	$30,$34
+	PHRASE	CREAM,68,JOYSTICK,SELECTS,LETTER
+	TEXT	$28,$34
+	PHRASE	CREAM,68,FIRE,MAKES,LETTER,ENTRY
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ROMSAVE	SET	*		;; Save the current address
@@ -158,6 +221,14 @@ ROMSAVE	SET	*		;; Save the current address
 	FDB	_GIVE	
 	FDB	_3	
 	FDB	_INITIALS
+	
+	fdb	_JOYSTICK
+	fdb	_SELECTS
+	fdb	_LETTER
+;	fdb	_FIRE
+	fdb	_MAKES
+	fdb 	_ENTRY
+
 
 PHRSAV	SET	*		;; Mark the new address for PHRSAV to add
 				;; more phrases later
@@ -165,24 +236,107 @@ PHRSAV	SET	*		;; Mark the new address for PHRSAV to add
 	ORG	ROMSAVE		;; Back to our regularly scheduled programming...
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-	NEW_SLEEP	TASK2,CENTRY,OHSTDMR  ;Make the task to get the entry
-	PULS	Y,U		;Restore our pointers
+;	NEW_SLEEP	TASK2,CENTRY,OHSTDMR  ;Make the task to get the entry
+;	PULS	Y,U		;Restore our pointers
+;
+;	STY	OHSTPTR,X	;Table pointer
+;	STU	OHSPSCR,X	;Player's score
+;
+;	LDA	#3		;Size of this entry request (3 initials)
+;	STA	OHSESZ,X
+;	LDD	#HSTDINS	;Post-Processing address
+;	STD	OHSPPR,X
+;	LDD	#$1E77		;Screen Base address
+;	STD	OHSBADR,X
+;	LDA	#CBLANK+1	;Initialize current letter
+;	STA	OHSCLT,X
+;	LDD	#MAXETV		;Maximum time to enter initials
+;	STD	OHSETM,X
+;	COMA			;Mark A register to designate task queued
+;	PULS	B,X,Y,U,PC	;  and return it to calling routine
 
-	STY	OHSTPTR,X	;Table pointer
-	STU	OHSPSCR,X	;Player's score
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	PULS	Y
+	LDB	#CBLANK+1	;Save a blank for this current letter
+	STB	OHSCLT,Y
 
-	LDA	#3		;Size of this entry request (3 initials)
-	STA	OHSESZ,X
-	LDD	#HSTDINS	;Post-Processing address
-	STD	OHSPPR,X
-	LDD	#$1E77		;Screen Base address
-	STD	OHSBADR,X
-	LDA	#CBLANK+1	;Initialize current letter
-	STA	OHSCLT,X
-	LDD	#MAXETV		;Maximum time to enter initials
-	STD	OHSETM,X
-	COMA			;Mark A register to designate task queued
-	PULS	B,X,Y,U,PC	;  and return it to calling routine
+	SLEEP	HERE		;Now go to sleep for a bit
+
+	TFR	Y,U		;Save Y register in U
+	LDX	OHSETM,U	;Get our time-out counter and
+	LEAX	-1,X		;  decrement and
+	LBEQ	HSTDINS		;  when time's up, install what we've got
+	STX	OHSETM,U	;  else save decremented value
+
+.3S	LDB	#WHITE		;Write the cursor at this location
+	JSR	WRCURS
+	JSR	WRCLT
+
+.4S	TST	OHSBNC,U	;Test if the bounce counter has counted down
+	BEQ	.5S		;  and if so then go feel for another input
+	DEC	OHSBNC,U	;  else bounce down
+	BRA	.10S		;  and go back to sleep
+
+.5S	JSR	APIA2		;Go feel for input
+	ANDA	#FORWARD+REVERSE+ENTER1		;Is it one of the ones we like?
+	BEQ	.10S		;Nah, so get outta here
+
+	CMPA	#ENTER1		;Yes!  Was it perchance the Enter input?
+	BEQ	.8S		;Yes!  So let's enter the current character
+
+	LDB	#MAXBNC
+	STB	OHSBNC,U
+	LDB	OHSCLT,U	;Get other char.  Get the current cursor pos
+	CMPA	#REVERSE	;  and test if we want to go back
+	BEQ	.6S		;  yes
+
+	INCB			;No, so go forward
+	CMPB	#MAXLET		;Does this take us beyond the last letter?
+	BLS	.7S		;  no
+	LDB	#MINLET		;  yes, so wrap-around to first character
+	BRA	.7S
+
+.6S	DECB			;Go backward
+	BPL	.7S
+	LDB	#MAXLET		;  yes, so wrap-around to last character
+
+.7S	STB	OHSCLT,U	;Save this character as the current one
+	JSR	ERCLT
+	BRA	.10S
+
+.8S	LDB	#MAXBNC*4
+	STB	OHSBNC,U
+
+	CLRB			;The current letter has been entered.  First, go
+	JSR	WRCURS		;  erase the cursor
+
+	LDA	OHSCLT,U	;Now, get this current letter
+
+	CMPA	#CRUB		;Was it the Rubout character?
+	BNE	.9S		;Nah, so go install it
+	LDA	OHSCPS,U	;Yes.  Is cursor displacement at left edge?
+	BEQ	.10S
+	JSR	ERCLT
+	DECA
+	STA	OHSCPS,U
+	ADDA	#OHSINIT
+	LDB	A,U
+	STB	OHSCLT,U	
+	BRA	.10S		;  and restart project
+				
+.9S	LDB	OHSCPS,U	;What?  Not Rubout?  Well, let's save character
+	ADDB	#OHSINIT	;  into task workspace
+	STA	B,U
+
+	LDB	OHSCPS,U	;Increment the cursor displacement
+	INCB			;  until
+	STB	OHSCPS,U        
+	CMPB	#3		;  it reaches 3, at which point all initials
+	BEQ	HSTDINS
+
+.10S	TFR	U,Y		;Restore the Y register
+	SLEEP	LOOP		;  and go sleepy-bye
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
 ;* The CENTRY task returns here for post-processing
@@ -227,7 +381,54 @@ HSTDINS	LDX	OHSTPTR,U	;Get pointer to correct table
 	TFR	U,Y		;Restore Y register and
 	JMP	DIE		;  go die
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;******************************************************************************
+;* WRCURS
+;*   Write cursor of color B at displacement OHSCPS
+;*
 
+WRCURS	PSHS	D,X
+
+	LDX	#$1C77
+	JSR	MAKSCX
+	LDA	#CCURS
+	LDB	1,S
+	JSR	OUTCHR
+
+	PULS	D,X,PC
+
+;******************************************************************************
+;* WRCLT
+;*   Write the current letter
+;*
+
+WRCLT	PSHS	D,X,Y,U
+
+	LDX	#$1E77
+	JSR	MAKSCX
+	LDA	OHSCLT,U
+	LDB	#YELLOW
+	JSR	OUTCHR
+
+	PULS	D,X,Y,U,PC
+
+;******************************************************************************
+;* ERCLT
+
+ERCLT	PSHS	D,X
+
+	LDX	#$1E77
+	JSR	MAKSCX
+	STX	DDEST
+	LDX	#$0608!$404								;;Fixme was: LDX  #$0608!X$404
+	STX	DHIGH
+	CLR	DCONS
+	LDA	#$12
+	STA	DCTRL
+
+	PULS	D,X,PC
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
 ;******************************************************************************
@@ -266,6 +467,21 @@ BLKMOV	PSHS	D,X,Y
 
 	PULS	D,X,Y,PC
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;******************************************************************************
+;* MAKSCX
+;*   Makes a screen address in X based on the base address in OHSBADR,U and
+;*   the current offset in OHSCPS,U (times 8)
+
+MAKSCX	PSHS	D					;; MAKSCX was moved to here in AMOA and is from OPENTRY.SRC
+
+	LDA	OHSCPS,U
+	LDB	#8
+	MUL
+	LEAX	B,X
+
+	PULS	D,PC
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;******************************************************************************
 ;* HSTDTL
@@ -303,371 +519,393 @@ HSTDTL	PSHS	X
 
 ;******************************************************************************
 ;* HSTDDT
+;HSTDDT	TFR	Y,X
+;	LDY	OHSPSCR,U	;Restore pointer to player's score
+;
+;	LDB	#4		;CMOS-move 4 bytes
+;
+;.104S	LDA	,Y+		;Go
+;	JSR	WCMOSA		;  do
+;	DECB			;  it
+;	BNE	.104S		;  to it
+;
+;	JSR	CENINS
+;
+;	RTS
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;******************************************************************************
+;* HSTDDT
 HSTDDT	TFR	Y,X
 	LDY	OHSPSCR,U	;Restore pointer to player's score
 
 	LDB	#4		;CMOS-move 4 bytes
-
+				
 .104S	LDA	,Y+		;Go
 	JSR	WCMOSA		;  do
 	DECB			;  it
 	BNE	.104S		;  to it
 
-	JSR	CENINS
+	LDB	#3
+	LEAY	OHSINIT,U
+
+.105S	LDA	,Y+
+	JSR	WCMOSA
+	DECB
+	BNE	.105S
 
 	RTS
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-
-
-	ROUTINE	OPENT
-;******************************************************************************
-;* OPENT
-;*   This routine gets the Operator Message and saves it to CMOS
-;*
-
-	LDD	,S		;Get return address
-	STD	OPENRTN		;  and save for later
-
-	CLR	PANMASK		;Turn off all switch-control 
-
-	JSR	SYSTINI		;Wipe clean thy slate, oh master
-	NEW_SLEEP	TASK2,OPENMS,OHSTDMR	;Start up the master task
-	JMP	STARTS		;Start up the system
-
-;*
-;* This is a pseudo-entry point for the CENTRY task ... whereas the HSTD Entry
-;*   queues CENTRY directly, operator entry does the pre-processing
-;*   within head of the task itself.  Once the CENTRY variables are set,
-;*   a jump into the CENTRY routine is taken
-
-OPENMS	CLR	$CA01		;Clear the DMA constant
-	JSR	CLRSCR		;Clear the screen
-
-	TEXT	$50,$36
-	PHRASE	WHITE,68,OPERATOR,MESSAGE,ENTRY
-	JSR	JFTEXT		;Joystick/fire text
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-ROMSAVE	SET	*		;; Save the current address
-
-	ORG	PHRSAV		;; Jump over to PHRSAV to save our pointers
-
-	FDB	_OPERATOR
-	FDB	_MESSAGE
-	FDB	_ENTRY
-
-PHRSAV	SET	*		;; Mark the new address for PHRSAV to add
-				;; more phrases later
-
-	ORG	ROMSAVE		;; Back to our regularly scheduled programming...
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-	LDA	#CBLANK		;Save a blank for this current letter
-	LDB	#OPENLEN*2
-	LDX	#CMOSOPE
-.1S	JSR	WCMOSA
-	DECB
-	BNE	.1S
-
-	STA	OHSCLT,Y
-	LDA	#OPENLEN	;Operator message entry length
-	STA	OHSESZ,Y
-	LDD	#OPENINS	;Post-processing address after input is complete
-	STD	OHSPPR,Y
-	LDD	#OPENMTM	;Maximum time for Operator message entry
-	STD	OHSETM,Y
-
-	LDD	#$3818		;Force second screen base address
-	STD	OHSBADR,Y	;  into task workspace
-	JSR	ALLCURS		;  and then go draw the second line of cursors
-
-	LDD	#$4018		;Set up the first screen base address
-	STD	OHSBADR,Y
-
-	JMP	CENTRY		;Go continue with the Character Entry task
-	
-
-;* OPENINS
-;*   The CENTRY routine returns here for post-processing of the Operator Message
-;*   first line
-
-OPENINS	LDX	#CMOSOPE	;Get address for first line of operator message
-
-	JSR	CENINS		;Go install the operator input into CMOS
-
-	LDD	#OPENI2		;Get the post-processing address for the second 
-	STD	OHSPPR,Y	;  line of operator message entry
-	LDD	#$3818		;Get the secpond screen base address
-	STD	OHSBADR,Y       
-	JMP	CENTRY		;Go continue the task
-
-;*  The CENTRY task returns here for post-processing of the Operator's second
-;*    line of text
-
-OPENI2	LDX	#CMOSO2		;Get CMOS address for second line of operator 
-	JSR	CENINS		;  text.  Go install this input
-				
-	JSR	SYSTINI		;Bomb out the system
-	LDS	#HSTK		;Restore the stack pointer
-	JMP	[OPENRTN]	;  and go back from whence we came
-
-
-;******************************************************************************
-;* CENINS
-;*   Character Entry Install subroutine
-;*   Installs OHSESZ characters starting at OHSINIT into the CMOS locations
-;*   pointed to by X
-;* ENTRY:
-;*	X has address in CMOS for move
-;*	U has task workspace address
-
-CENINS	PSHS	D,Y
-
-	LEAY	OHSINIT,U	;Get literal address of characters
-				
-	LDB	OHSESZ,U	;Get character count
-				
-.10S	LDA	,Y+		;Get next character
-	JSR	WCMOSA		;Write it to CMOS
-	DECB			;Countdown
-	BNE	.10S		;  and loop until done
-
-	PULS	D,Y,PC
-
-
-;******************************************************************************
-;* WRCURS
-;*   Write cursor of color B at the current offset
-;*
-
-WRCURS	PSHS	D,X
-
-	JSR	MAKSCX
-	LEAX	-$200,X		;Adjust for cursor being below letters
-	LDA	#CCURS
-	JSR	OUTCHR
-
-	PULS	D,X,PC
-
-;******************************************************************************
-;* WRCLT
-;*   Write the current letter at the current offset
-
-WRCLT	PSHS	D,X,Y,U
-
-	JSR	MAKSCX
-	LDA	OHSCLT,U
-	LDB	#YELLOW
-	JSR	OUTCHR
-
-	PULS	D,X,Y,U,PC
-
-;******************************************************************************
-;* ERCLT
-;*   Erases the letter at the current offset
-
-ERCLT	PSHS	D,X
-
-	JSR	MAKSCX
-	STX	DDEST
-	LDX	#$0608!$404								;;Fixme was: LDX  #$0608!X$404
-	STX	DHIGH
-	CLR	DCONS
-	LDA	#$12
-	STA	DCTRL
-
-	PULS	D,X,PC
-
-
+;	ROUTINE	OPENT
+;;******************************************************************************
+;;* OPENT
+;;*   This routine gets the Operator Message and saves it to CMOS
+;;*
+;
+;	LDD	,S		;Get return address
+;	STD	OPENRTN		;  and save for later
+;
+;	CLR	PANMASK		;Turn off all switch-control 
+;
+;	JSR	SYSTINI		;Wipe clean thy slate, oh master
+;	NEW_SLEEP	TASK2,OPENMS,OHSTDMR	;Start up the master task
+;	JMP	STARTS		;Start up the system
+;
+;;*
+;;* This is a pseudo-entry point for the CENTRY task ... whereas the HSTD Entry
+;;*   queues CENTRY directly, operator entry does the pre-processing
+;;*   within head of the task itself.  Once the CENTRY variables are set,
+;;*   a jump into the CENTRY routine is taken
+;
+;OPENMS	CLR	$CA01		;Clear the DMA constant
+;	JSR	CLRSCR		;Clear the screen
+;
+;	TEXT	$50,$36
+;	PHRASE	WHITE,68,OPERATOR,MESSAGE,ENTRY
+;	JSR	JFTEXT		;Joystick/fire text
+;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;ROMSAVE	SET	*		;; Save the current address
+;
+;	ORG	PHRSAV		;; Jump over to PHRSAV to save our pointers
+;
+;	FDB	_OPERATOR
+;	FDB	_MESSAGE
+;	FDB	_ENTRY
+;
+;PHRSAV	SET	*		;; Mark the new address for PHRSAV to add
+;				;; more phrases later
+;
+;	ORG	ROMSAVE		;; Back to our regularly scheduled programming...
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;
+;	LDA	#CBLANK		;Save a blank for this current letter
+;	LDB	#OPENLEN*2
+;	LDX	#CMOSOPE
+;.1S	JSR	WCMOSA
+;	DECB
+;	BNE	.1S
+;
+;	STA	OHSCLT,Y
+;	LDA	#OPENLEN	;Operator message entry length
+;	STA	OHSESZ,Y
+;	LDD	#OPENINS	;Post-processing address after input is complete
+;	STD	OHSPPR,Y
+;	LDD	#OPENMTM	;Maximum time for Operator message entry
+;	STD	OHSETM,Y
+;
+;	LDD	#$3818		;Force second screen base address
+;	STD	OHSBADR,Y	;  into task workspace
+;	JSR	ALLCURS		;  and then go draw the second line of cursors
+;
+;	LDD	#$4018		;Set up the first screen base address
+;	STD	OHSBADR,Y
+;
+;	JMP	CENTRY		;Go continue with the Character Entry task
+;	
+;
+;;* OPENINS
+;;*   The CENTRY routine returns here for post-processing of the Operator Message
+;;*   first line
+;
+;OPENINS	LDX	#CMOSOPE	;Get address for first line of operator message
+;
+;	JSR	CENINS		;Go install the operator input into CMOS
+;
+;	LDD	#OPENI2		;Get the post-processing address for the second 
+;	STD	OHSPPR,Y	;  line of operator message entry
+;	LDD	#$3818		;Get the secpond screen base address
+;	STD	OHSBADR,Y       
+;	JMP	CENTRY		;Go continue the task
+;
+;;*  The CENTRY task returns here for post-processing of the Operator's second
+;;*    line of text
+;
+;OPENI2	LDX	#CMOSO2		;Get CMOS address for second line of operator 
+;	JSR	CENINS		;  text.  Go install this input
+;				
+;	JSR	SYSTINI		;Bomb out the system
+;	LDS	#HSTK		;Restore the stack pointer
+;	JMP	[OPENRTN]	;  and go back from whence we came
+;
+;
+;;******************************************************************************
+;;* CENINS
+;;*   Character Entry Install subroutine
+;;*   Installs OHSESZ characters starting at OHSINIT into the CMOS locations
+;;*   pointed to by X
+;;* ENTRY:
+;;*	X has address in CMOS for move
+;;*	U has task workspace address
+;
+;CENINS	PSHS	D,Y
+;
+;	LEAY	OHSINIT,U	;Get literal address of characters
+;				
+;	LDB	OHSESZ,U	;Get character count
+;				
+;.10S	LDA	,Y+		;Get next character
+;	JSR	WCMOSA		;Write it to CMOS
+;	DECB			;Countdown
+;	BNE	.10S		;  and loop until done
+;
+;	PULS	D,Y,PC
+;
+;
+;;******************************************************************************
+;;* WRCURS
+;;*   Write cursor of color B at the current offset
+;;*
+;
+;WRCURS	PSHS	D,X
+;
+;	JSR	MAKSCX
+;	LEAX	-$200,X		;Adjust for cursor being below letters
+;	LDA	#CCURS
+;	JSR	OUTCHR
+;
+;	PULS	D,X,PC
+;
+;;******************************************************************************
+;;* WRCLT
+;;*   Write the current letter at the current offset
+;
+;WRCLT	PSHS	D,X,Y,U
+;
+;	JSR	MAKSCX
+;	LDA	OHSCLT,U
+;	LDB	#YELLOW
+;	JSR	OUTCHR
+;
+;	PULS	D,X,Y,U,PC
+;
+;;******************************************************************************
+;;* ERCLT
+;;*   Erases the letter at the current offset
+;
+;ERCLT	PSHS	D,X
+;
+;	JSR	MAKSCX
+;	STX	DDEST
+;	LDX	#$0608!$404								;;Fixme was: LDX  #$0608!X$404
+;	STX	DHIGH
+;	CLR	DCONS
+;	LDA	#$12
+;	STA	DCTRL
+;
+;	PULS	D,X,PC
+;
+;
 ;******************************************************************************
 ;* MAKSCX
 ;*   Makes a screen address in X based on the base address in OHSBADR,U and
 ;*   the current offset in OHSCPS,U (times 8)
-
-MAKSCX	PSHS	D
-
-	LDA	OHSCPS,U
-	LDB	#8
-	MUL
-	ADDD	OHSBADR,U
-	TFR	D,X
-
-	PULS	D,PC
-
-
-
-;******************************************************************************
-;* ALLCURS
-
-ALLCURS	PSHS	D,U
-
-	TFR	Y,U
-
-	LDB	OHSESZ,Y
-	STB	OHSCPS,Y
-	LDB	#BLUE
-
-.10S	DEC	OHSCPS,Y
-	BMI	.20S
-	JSR	WRCURS
-	BRA	.10S
-
-.20S	INC	OHSCPS,Y
-
-	PULS	D,U,PC
-
-
-;******************************************************************************
-;* JFTEXT
-;*   Write the Joystick/Fire Button Message to the screen
-
-JFTEXT	PSHS	D,X,Y
-
-	TEXT	$30,$50
-	PHRASE	CREAM,68,USE,JOYSTICK,TO
-	TEXT	$28,$46
-	PHRASE	CREAM,68,MAKE,LETTER,ENTRY
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-ROMSAVE	SET	*		;; Save the current address
-
-	ORG	PHRSAV		;; Jump over to PHRSAV to save our pointers
-
-	FDB	_USE
-	FDB	_JOYSTICK
-;	FDB	_TO
-;	FDB	_MAKE
-	FDB	_LETTER
-;	FDB	_ENTRY
-
-PHRSAV	SET	*		;; Mark the new address for PHRSAV to add
-				;; more phrases later
-
-	ORG	ROMSAVE		;; Back to our regularly scheduled programming...
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-	PULS	D,X,Y,PC
-
-;******************************************************************************
-;* CENTRY
-;*   Character entry routine
-;*   Gets entry from Joystick/Buttons, enters into current task workspace
-;*
-;* This is a segment of a task.  Either the player's initials or the operator
-;*   entry can be made through here.  The return address from this task segment
-;*   is specified in OHSBADR.  When the return is finally taken, the
-;*   results of the character input remain in the task workspace
-;*
-;* WANTS:  
-;*	OHSCLT (1) current letter set (initials set to "A", op-entry to " ")
-;*	OHSETM (2) maximum time to make entry
-;*	OHSESZ (1) entry size (Initials set to 3, operator entry to 20.)
-;*	OHSPPR (2) Return address when this portion of the task is completed
-;*	OHSBADR (2) Base address for character input
-;*
-;* RETURNS:
-;*   Returns to the address specified in OHSPPR for post-processing of
-;*   characters.
-;*	OHSINIT (20.) characters entered through this routine
-;*		      if this is the player's initials, only the first 3 count
-;*       U Register has address of task workspace
-
-CENTRY	CLR	OHSCPS,Y	;Cursor positioned initialized
-				
-	LDA	#CBLANK		;Get a blank character
-	LDB	OHSESZ,Y        
-	LEAU	OHSINIT-1,Y	;Get the address for the characters
-.10S	STA	B,U		;Store a blank here
-	DECB			;  and
-	BNE	.10S		;  repeat
-
-	LDA	#MAXBNC
-	STA	OHSBNC,Y
-
-	JSR	ALLCURS
-
-	SLEEP	HERE		;Now go to sleep for a bit
-
-	TFR	Y,U		;Save Y register in U
-	LDX	OHSETM,U	;Get our time-out counter and
-	LEAX	-1,X		;  decrement and
-	BNE	.20S             
-	JMP	[OHSPPR,U]	;  when time's up, install what we've got
-.20S	STX	OHSETM,U	;  else save decremented value
-
-
-	LDB	#WHITE		;Write the cursor at this location
-	JSR	WRCURS
-
-	JSR	WRCLT
-
-	TST	OHSBNC,U	;Test if the bounce counter has counted down
-	BEQ	.30S		;  and if so then go feel for another input
-	DEC	OHSBNC,U	;  else bounce down
-	BRA	.100S		;  and go back to sleep
-
-.30S	JSR	APIA2		;Go feel for input
-	ANDA	#FORWARD+REVERSE+JYLEFT+JYRIGHT  ;Is it one of the ones we like?
-	BEQ	.100S		;Nah, so get outta here
-
-	LDB	#MAXBNC
-	STB	OHSBNC,U
-	LDB	OHSCLT,U
-
-	CMPA	#FORWARD
-	BEQ	.50S
-	CMPA	#REVERSE
-	BEQ	.60S
-
-	PSHS	A
-	LDB	#MAXBNC*4								;;Patched over in BOBFIXES ($8B0F) "Change the bounce value after letter entry from MAXBNC*4 to 6"
-	STB	OHSBNC,U
-	LDB	#BLUE		;The current letter has been entered.  First, go
-	JSR	WRCURS		;  erase the cursor
-	LDB	OHSCLT,U
-	LDA	OHSCPS,U
-	ADDA	#OHSINIT
-	STB	A,U
-	PULS	A
-	
-	CMPA	#JYLEFT
-	BEQ	.40S
-
-;* Entry is "Joystick Right" bit for Next Letter
-	LDA	OHSCPS,U	;Increment the cursor displacement
-	INCA			;  until
-	CMPA	OHSESZ,U	;  it reaches 3, at which point all initials
-	BNE	.45S
-	JMP	[OHSPPR,U]
-
-;* Entry is Joystick Left for Move to Previous Letter
-.40S	LDA	OHSCPS,U	;Yes.  Is cursor displacement at left edge?
-	BEQ	.100S
-	DECA
-
-.45S	STA	OHSCPS,U
-	ADDA	#OHSINIT
-	LDB	A,U
-	STB	OHSCLT,U	
-	BRA	.100S		;  and restart project
-
-
-;* Entry is Joystick Up for Increase Current Letter
-.50S	INCB			;Go forward
-	CMPB	#MAXLET		;Does this take us beyond the last letter?
-	BLS	.65S		;  no
-	CLRB			;  yes, so wrap-around to first character
-	BRA	.65S
-
-;* Entry is Joystick Down for Decrease Current Letter
-.60S	DECB			;Go backward
-	BPL	.65S             
-	LDB	#MAXLET		;  yes, so wrap-around to last character
-				
-.65S	STB	OHSCLT,U	;Save this character as the current one
-	JSR	ERCLT           
-				
-.100S	TFR	U,Y		;Restore the Y register
-	SLEEP	LOOP		;  and go sleepy-bye
+;
+;MAKSCX	PSHS	D
+;
+;	LDA	OHSCPS,U
+;	LDB	#8
+;	MUL
+;	ADDD	OHSBADR,U
+;	TFR	D,X
+;
+;	PULS	D,PC
+;
+;
+;
+;;******************************************************************************
+;;* ALLCURS
+;
+;ALLCURS	PSHS	D,U
+;
+;	TFR	Y,U
+;
+;	LDB	OHSESZ,Y
+;	STB	OHSCPS,Y
+;	LDB	#BLUE
+;
+;.10S	DEC	OHSCPS,Y
+;	BMI	.20S
+;	JSR	WRCURS
+;	BRA	.10S
+;
+;.20S	INC	OHSCPS,Y
+;
+;	PULS	D,U,PC
+;
+;
+;;******************************************************************************
+;;* JFTEXT
+;;*   Write the Joystick/Fire Button Message to the screen
+;
+;JFTEXT	PSHS	D,X,Y
+;
+;	TEXT	$30,$50
+;	PHRASE	CREAM,68,USE,JOYSTICK,TO
+;	TEXT	$28,$46
+;	PHRASE	CREAM,68,MAKE,LETTER,ENTRY
+;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;ROMSAVE	SET	*		;; Save the current address
+;
+;	ORG	PHRSAV		;; Jump over to PHRSAV to save our pointers
+;
+;	FDB	_USE
+;	FDB	_JOYSTICK
+;;	FDB	_TO
+;;	FDB	_MAKE
+;	FDB	_LETTER
+;;	FDB	_ENTRY
+;
+;PHRSAV	SET	*		;; Mark the new address for PHRSAV to add
+;				;; more phrases later
+;
+;	ORG	ROMSAVE		;; Back to our regularly scheduled programming...
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;
+;	PULS	D,X,Y,PC
+;
+;;******************************************************************************
+;;* CENTRY
+;;*   Character entry routine
+;;*   Gets entry from Joystick/Buttons, enters into current task workspace
+;;*
+;;* This is a segment of a task.  Either the player's initials or the operator
+;;*   entry can be made through here.  The return address from this task segment
+;;*   is specified in OHSBADR.  When the return is finally taken, the
+;;*   results of the character input remain in the task workspace
+;;*
+;;* WANTS:  
+;;*	OHSCLT (1) current letter set (initials set to "A", op-entry to " ")
+;;*	OHSETM (2) maximum time to make entry
+;;*	OHSESZ (1) entry size (Initials set to 3, operator entry to 20.)
+;;*	OHSPPR (2) Return address when this portion of the task is completed
+;;*	OHSBADR (2) Base address for character input
+;;*
+;;* RETURNS:
+;;*   Returns to the address specified in OHSPPR for post-processing of
+;;*   characters.
+;;*	OHSINIT (20.) characters entered through this routine
+;;*		      if this is the player's initials, only the first 3 count
+;;*       U Register has address of task workspace
+;
+;CENTRY	CLR	OHSCPS,Y	;Cursor positioned initialized
+;				
+;	LDA	#CBLANK		;Get a blank character
+;	LDB	OHSESZ,Y        
+;	LEAU	OHSINIT-1,Y	;Get the address for the characters
+;.10S	STA	B,U		;Store a blank here
+;	DECB			;  and
+;	BNE	.10S		;  repeat
+;
+;	LDA	#MAXBNC
+;	STA	OHSBNC,Y
+;
+;	JSR	ALLCURS
+;
+;	SLEEP	HERE		;Now go to sleep for a bit
+;
+;	TFR	Y,U		;Save Y register in U
+;	LDX	OHSETM,U	;Get our time-out counter and
+;	LEAX	-1,X		;  decrement and
+;	BNE	.20S             
+;	JMP	[OHSPPR,U]	;  when time's up, install what we've got
+;.20S	STX	OHSETM,U	;  else save decremented value
+;
+;
+;	LDB	#WHITE		;Write the cursor at this location
+;	JSR	WRCURS
+;
+;	JSR	WRCLT
+;
+;	TST	OHSBNC,U	;Test if the bounce counter has counted down
+;	BEQ	.30S		;  and if so then go feel for another input
+;	DEC	OHSBNC,U	;  else bounce down
+;	BRA	.100S		;  and go back to sleep
+;
+;.30S	JSR	APIA2		;Go feel for input
+;	ANDA	#FORWARD+REVERSE+JYLEFT+JYRIGHT  ;Is it one of the ones we like?
+;	BEQ	.100S		;Nah, so get outta here
+;
+;	LDB	#MAXBNC
+;	STB	OHSBNC,U
+;	LDB	OHSCLT,U
+;
+;	CMPA	#FORWARD
+;	BEQ	.50S
+;	CMPA	#REVERSE
+;	BEQ	.60S
+;
+;	PSHS	A
+;	LDB	#MAXBNC*4								;;Patched over in BOBFIXES ($8B0F) "Change the bounce value after letter entry from MAXBNC*4 to 6"
+;	STB	OHSBNC,U
+;	LDB	#BLUE		;The current letter has been entered.  First, go
+;	JSR	WRCURS		;  erase the cursor
+;	LDB	OHSCLT,U
+;	LDA	OHSCPS,U
+;	ADDA	#OHSINIT
+;	STB	A,U
+;	PULS	A
+;	
+;	CMPA	#JYLEFT
+;	BEQ	.40S
+;
+;;* Entry is "Joystick Right" bit for Next Letter
+;	LDA	OHSCPS,U	;Increment the cursor displacement
+;	INCA			;  until
+;	CMPA	OHSESZ,U	;  it reaches 3, at which point all initials
+;	BNE	.45S
+;	JMP	[OHSPPR,U]
+;
+;;* Entry is Joystick Left for Move to Previous Letter
+;.40S	LDA	OHSCPS,U	;Yes.  Is cursor displacement at left edge?
+;	BEQ	.100S
+;	DECA
+;
+;.45S	STA	OHSCPS,U
+;	ADDA	#OHSINIT
+;	LDB	A,U
+;	STB	OHSCLT,U	
+;	BRA	.100S		;  and restart project
+;
+;
+;;* Entry is Joystick Up for Increase Current Letter
+;.50S	INCB			;Go forward
+;	CMPB	#MAXLET		;Does this take us beyond the last letter?
+;	BLS	.65S		;  no
+;	CLRB			;  yes, so wrap-around to first character
+;	BRA	.65S
+;
+;;* Entry is Joystick Down for Decrease Current Letter
+;.60S	DECB			;Go backward
+;	BPL	.65S             
+;	LDB	#MAXLET		;  yes, so wrap-around to last character
+;				
+;.65S	STB	OHSCLT,U	;Save this character as the current one
+;	JSR	ERCLT           
+;				
+;.100S	TFR	U,Y		;Restore the Y register
+;	SLEEP	LOOP		;  and go sleepy-bye
 
 	PULLORG	ROMSAVE

@@ -110,4 +110,87 @@ PNTSCT	FDB	$7C3A,$7140
 IBARREL	FDB	$0201,.1S
 .1S	FCB	$42,$20								;;Fixme was: 1$ 	FCB	$42,$20
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;	
+;;
+;;  The following is a list of patches that appear in AMOA but were later
+;;  moved to their final location.
+
+AMOASiniInhibit
+	LDD	FINISH
+	CMPD	#ALIVE
+	BNE	.1S
+	RTS
+	
+.1S	JSR	Sinhibit
+	JMP	LSSINI+3
+
+AMOASiniOrbit
+	NOP
+					;; The following code was later moved to WITT/SINI.ASM
+.100S	lda	OSPERS,Y
+	anda	#PSiniInhibit
+	beq	.102S
+	ldb	SiniOrbit		;* Set orbital directon.
+	cmpa	#MaxSinOrbit
+	ble	.101S
+	lda	#MaxSinOrbit
+.101S	jsr	getlodistance
+	ldx	#StblOSini
+	rts
+.102S	jsr	getldistance
+	ldx	#STblSinistar								;;Fixme was: ldx  #STblSini
+	rts
+	
+AMOASiniOrbit2
+	NOP
+	
+.200S	lda	OSPERS,Y	
+	anda	#PSiniInhibit	
+	beq	.202S	
+	ldb	SiniOrbit		
+	cmpa	#MaxSinOrbit	
+	ble	.201S	
+	lda	#MaxSinOrbit	
+.201S	jsr	getsodistance	
+	ldx	#StblOSini	
+	rts	
+.202S	jsr	getsdistance	
+	ldx	#STblSinistar	
+	rts	
+
+AMOAIRSini
+;*					;; The following code was later moved to FALS/N1ALL.ASM
+;*				This section from RICH
+	RANDOM	OSEED1,BYTE
+	anda	#~(PSiniInhibit)					
+	ora	#MaxSinOrbit
+	sta	OSPERS,X
+;*
+;*
+	jsr	Vibzer			;* Zero out its vibration block
+	rts
+
+;***
+;*	Update the scanner velocity (short)
+;***	
+AMOAUpdateScanVEL			;; This section later appears in WITT/VELOCITY.ASM
+	tstb			;* Only round up if B is positive
+	bmi	.3S		;*   else, round down.
+	orb	#1		;* < Patched over >
+.4S	addb	0,Y		;* < Patched over >
+	RTS
+					;; This ANDB instruction shows up in WITT/WARRON.ASM
+.3S	andb	#%11111110	;*   (only even number missions allowed
+	BRA	.4S
+
+;* Bomb Sinistar
+AMOASiniStun				;; This section later appears in WITT/COLLISIO.ASM
+	lda	InStun		;* Accumulate
+	adda	#2		;*   more time that
+	sta	InStun		;*   the Sinistar is stunned.
+	
+					;; This instruction comes from WITT/WARRON.ASM
+	jmp	VScrOn		;* Perform the remaining screen on jobs.	
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;	
+
 	PULLORG	ROMSAVE
