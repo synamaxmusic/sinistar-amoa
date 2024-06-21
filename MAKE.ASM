@@ -9,7 +9,12 @@
 ;
 ;    A game by Sam Dicker, Noah Falstein, Bob Mical and Richard Witt
 ;
-;	    Source code rewrite by SynaMax, started 11/6/23
+;		 *** AMOA '82 PROTOTYPE VERSION ***
+;
+;	    Source code rewrite by SynaMax, started 11/6/23,
+;	    complete ROM set rebuilt for the first time on 01/12/24
+;
+;	    AMOA code reconstruction, started 6/10/24
 ;
 ;===============================================================================
 ;
@@ -80,6 +85,12 @@
 
 ;===============================================================================
 ;  				<<< DEBUG DEFINES >>>
+
+KENSMARQ EQU	1
+
+;;  KENSMARQ is on by DEFAULT!
+;;
+;;  This enables the awesome "MARQUEE" title screen graphic seen in the AMOA build.
 
 PROMS	EQU	1		;* Define before burning proms
 
@@ -414,7 +425,7 @@ PROMS	EQU	1		;* Define before burning proms
 	INCLUDE	WITT/new_equates.ASM	;;Added to support longer symbol names
 
 	INCLUDE WITT/RICHS.ASM
-	INCLUDE WITT/RICHS2.ASM		;;(Control Panel Button handling with Easter Egg routine)
+;	INCLUDE WITT/RICHS2.ASM		;;(Control Panel Button handling with Easter Egg routine)
 
 ;===============================================================================
 ;
@@ -447,8 +458,8 @@ PROMS	EQU	1		;* Define before burning proms
 ;  F      IIIII  X   X  EEEEE  SSSS 
 ;
 
-	INCLUDE WITT/AOE.ASM		
-	
+	INCLUDE WITT/AOE.ASM
+
 ;===============================================================================
 ;  
 ;  DDDD   IIIII   AAA    GGGG
@@ -459,7 +470,7 @@ PROMS	EQU	1		;* Define before burning proms
 ;
 
 	INCLUDE SAM/DIAG.ASM
-	INCLUDE FALS/LAST.ASM		;;Final patches found in Revision 3 rom, can be built without DIAG.ASM
+;	INCLUDE FALS/LAST.ASM		;;Final patches found in Revision 3 rom, can be built without DIAG.ASM
 	
 ;===============================================================================
 ;
