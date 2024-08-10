@@ -38,7 +38,7 @@
 ;
 ;       Address:                MAME ROM set Filename:
 ;       0000-0FFF = ROM 1       sinistar_rom_1-b_16-3004-12.1d
-;       1000-1FFF = ROM 2       sinistar_rom_2-b_16-3004-13.1c
+;       1000-1FFF = ROM 2       sinistar_rom_2-b_16-3004-13.1c (Same as final)
 ;       2000-2FFF = ROM 3       sinistar_rom_3-b_16-3004-14.1a
 ;       3000-3FFF = ROM 4       sinistar_rom_4-b_16-3004-15.2d
 ;       4000-4FFF = ROM 5       sinistar_rom_5-b_16-3004-16.2c
