@@ -955,7 +955,7 @@ TAIL2   INC     TEMP                                            ;;Fixme was: 2$
 
 ;* patch to player image rotation
 ;       ERR     OLD ADDRESS
-        PUSHORG $378A                                           ;;Fixme was: PUSHORG    $3789
+        PUSHORG $3789                                           ;; Modded version for final uses $378A
         JSR     TA100S                                          ;;Fixme was: JSR        100$
         PULLORG
 TA100S                                                          ;;Fixme was: 100$
@@ -974,7 +974,7 @@ TAILTBL FDB     $FC02,$FC02,$FD01,$FDFF,$FFFE,$FFFD,$00FD,$FFFD
 
 ;*<<< for Noah >>>
 ;       ERR     OLD ADDRESS
-        PUSHORG $736D                                           ;;Fixme was: PUSHORG    $6F51
+        PUSHORG $6F51                                           ;; Modded version for final uses $736D
         JSR     TA101S                                          ;;Fixme was: JSR        101$
         PULLORG
 TA101S                                                          ;;Fixme was: 101$
