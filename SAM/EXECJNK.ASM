@@ -166,7 +166,7 @@ SCAN3S  LDB     ZONECOL         ;get zone color
         BHS     SCROLL          ;to great?, skip acceleration
 ;       LDB     PLLUNIT         ;accelerate player:  get l unit vector
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-        JSR     $47C2
+        JSR     SINCOS
         PSHS    A
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
         SEX                     ;get l component of unit vector
@@ -245,7 +245,7 @@ SCROLL  LDA     PANMASK         ;scrolling and stars on?
 ;       LDD     PLSUNIT         ;soft scrolling: get player ship unit vector
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
         LDA     PLYRANG
-        JSR     $47C2
+        JSR     SINCOS
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
         RPT     3,ASRA          ;scale down to add to players position
         RPT     3,ASRB
