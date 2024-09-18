@@ -142,7 +142,7 @@ KENSMARQ EQU    1
         INCLUDE WITT/new_equates.ASM    ;; Added to support longer symbol names
 
         INCLUDE WITT/RICHS.ASM
-;       INCLUDE WITT/RICHS2.ASM         ;; (Control Panel Button handling with
+;;       INCLUDE WITT/RICHS2.ASM        ;; (Control Panel Button handling with
                                         ;; Easter Egg routine...NOT IN AMOA)
 
 ;===============================================================================
@@ -195,7 +195,7 @@ KENSMARQ EQU    1
 ;
 
         INCLUDE SAM/DIAG.ASM            ;; Diagnostic ROM 11
-;       INCLUDE FALS/LAST.ASM           ;; Final patches found in Revision 3 rom
+;;       INCLUDE FALS/LAST.ASM          ;; Final patches found in Revision 3 rom
                                         ;; (can be built without DIAG.ASM)
                                         ;; NOT USED IN AMOA!!
 
