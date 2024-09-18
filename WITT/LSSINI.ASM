@@ -18,7 +18,11 @@
         ROUTINE LSSINI                                                          ;; This gets patched over with SAM/FIXLSSIN.ASM ($5DBE)
 ;       jsr     Sinhibit        ;* Re-initialize Sinistar attack personality.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+        IFNEXIST  MICA/BOBS.ASM
+        RPT     3,NOP
+        ELSE
         JMP     AMOASiniInhibit
+        ENDIF
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
         LEAS    2,S             ;never return to in-sector
         LDD     OSLPOS,Y        ;transfer sector coordinates into supersector

@@ -247,7 +247,11 @@ CSINI   FDB     8000            ;collision mask
 ;       FDB     VSCRON          ;onscreen routine
 ;       FDB     TRAP            ;vector to leave-sector routine
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+        IFNEXIST  MICA/BOBS.ASM
+        RPT     2,NOP
+        ELSE
         FDB     AMOASiniStun    ;onscreen routine
+        ENDIF
         FDB     LSSINI          ;vector to leave-sector routine
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
         fdb     0               ;* Index to scanner object CD Table

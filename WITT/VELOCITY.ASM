@@ -165,7 +165,11 @@ updscanner
 ;.2S    andb    #-2             ;* Round down when B is negative.
 ;.3S    addb    0,Y             ;* < Patched over >
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+        IFNEXIST  MICA/BOBS.ASM
+        RPT     3,NOP
+        ELSE
         JSR     AMOAUpdateScanVEL
+        ENDIF
         NOP
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
         stb     0,Y             ;*   gradual.

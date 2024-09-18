@@ -73,7 +73,11 @@
 ;       jsr     .100S           ;* D = the LONG distance to player
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+        IFNEXIST  MICA/BOBS.ASM
+        RPT     3,NOP
+        ELSE
         JSR     AMOASiniOrbit
+        ENDIF
         RPT     3,NOP
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -92,7 +96,11 @@
 ;       jsr     .200S           ;* D = the SHORT distance to player
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+        IFNEXIST  MICA/BOBS.ASM
+        RPT     3,NOP
+        ELSE
         JSR     AMOASiniOrbit2
+        ENDIF
         RPT     3,NOP
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 

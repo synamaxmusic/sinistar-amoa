@@ -1092,7 +1092,11 @@ IRSini  New_Scan        CSini           ;* Get scanner WS
 ;*
 ;       jsr     Vibzer                  ;* Zero out its vibration block
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+        IFNEXIST  MICA/BOBS.ASM
+        RPT     3,NOP
+        ELSE
         JSR     AMOAIRSini
+        ENDIF
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
         jsr     InCaller                ;* Give it Caller primary intelligence
         ldd     OIndex,X                ;* Get index to Sinistar
